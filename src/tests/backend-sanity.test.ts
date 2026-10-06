@@ -47,13 +47,13 @@ describe('backend sanity', () => {
 		vi.advanceTimersByTime(5000);
 		expect(submitGuess(room, ann.token, 'nope', 0)).toEqual({ status: 'wrong' });
 		expect(submitGuess(room, ann.token, answer.name, 1)).toEqual({ status: 'not_active' });
-		expect(submitGuess(room, ann.token, answer.name.toUpperCase(), 0)).toMatchObject({ status: 'correct', points: 50 });
+		expect(submitGuess(room, ann.token, answer.name.toUpperCase(), 0)).toMatchObject({ status: 'correct', points: 75 });
 		expect(submitGuess(room, ann.token, answer.name, 0)).toEqual({ status: 'already_correct' });
 		expect(room.phase).toBe('round_active');
 		expect(submitGuess(room, bob.value.token, answer.name, 0)).toMatchObject({ status: 'correct' });
 		// all connected correct -> early end
 		expect(room.phase).toBe('round_reveal');
-		expect(ann.score).toBe(50);
+		expect(ann.score).toBe(75);
 		expect(snapshotFor(room).revealed?.pokemon.name).toBe(answer.name);
 		vi.advanceTimersByTime(4000);
 		expect(room.phase).toBe('leaderboard');
