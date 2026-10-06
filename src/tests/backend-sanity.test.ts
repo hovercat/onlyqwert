@@ -47,13 +47,13 @@ describe('backend sanity', () => {
 		vi.advanceTimersByTime(5000);
 		expect(submitGuess(room, ann.token, 'nope', 0)).toEqual({ status: 'wrong' });
 		expect(submitGuess(room, ann.token, answer.name, 1)).toEqual({ status: 'not_active' });
-		expect(submitGuess(room, ann.token, answer.name.toUpperCase(), 0)).toMatchObject({ status: 'correct', points: 50 });
+		expect(submitGuess(room, ann.token, answer.name.toUpperCase(), 0)).toMatchObject({ status: 'correct', points: 75 });
 		expect(submitGuess(room, ann.token, answer.name, 0)).toEqual({ status: 'already_correct' });
 		expect(room.phase).toBe('round_active');
 		expect(submitGuess(room, bob.value.token, answer.name, 0)).toMatchObject({ status: 'correct' });
 		// all connected correct -> early end
 		expect(room.phase).toBe('round_reveal');
-		expect(ann.score).toBe(50);
+		expect(ann.score).toBe(75);
 		expect(snapshotFor(room).revealed?.pokemon.name).toBe(answer.name);
 		vi.advanceTimersByTime(4000);
 		expect(room.phase).toBe('leaderboard');
@@ -107,5 +107,19 @@ describe('teardown', () => {
 		const before = vi.getTimerCount(); // only the idle sweeper
 		unsub();
 		expect(vi.getTimerCount()).toBe(before);
+	});
+});
+
+describe('scoring floor via submitGuess', () => {
+	it('awards 50 at endsAt - 1 and nothing at endsAt', () => {
+		const { room, ann } = setup();
+		const bob = joinRoom(room, 'Bob');
+		if (!bob.ok) throw new Error(bob.error);
+		expect(startGame(room).ok).toBe(true);
+		const round = room.rounds[0];
+		const name = getPokemon(round.pokemonId)!.name;
+		expect(submitGuess(room, ann.token, name, 0, round.endsAt - 1)).toMatchObject({ status: 'correct', points: 50 });
+		expect(submitGuess(room, bob.value.token, name, 0, round.endsAt)).toEqual({ status: 'not_active' });
+		expect(bob.value.score).toBe(0);
 	});
 });

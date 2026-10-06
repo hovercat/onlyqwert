@@ -126,7 +126,7 @@ All tests use the contracts above and B's exported functions. Until B merges, D 
 
 ### D1 Unit tests
 Files: `src/tests/unit/*.spec.ts`.
-Covers: normalizeName examples, isCorrectGuess incl. aliases, calculateScore (full ≈ 100, half ≈ 50, last ms ≥ 1, clamps), rankPlayers ties, room code generator, pickPokemon (generations, no repeats until exhausted), state machine transitions with fake timers.
+Covers: normalizeName examples, isCorrectGuess incl. aliases, calculateScore (full = 100, half = 75, last ms = 50, quarter left = 63, clamps to 50..100), rankPlayers ties, room code generator, pickPokemon (generations, no repeats until exhausted), state machine transitions with fake timers.
 
 ### D2 Endpoint tests
 Files: `src/tests/api/*.spec.ts`, `src/tests/helpers/*.ts` (mock `RequestEvent` with cookie jar).
