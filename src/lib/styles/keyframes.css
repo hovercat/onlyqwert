@@ -49,25 +49,3 @@
 	}
 }
 
-@keyframes oq-hero-flash {
-	0%,
-	100% {
-		color: #ffcb05;
-		text-shadow: 0 0 18px rgb(255 203 5 / 0.7);
-	}
-	50% {
-		color: #ff3b3b;
-		text-shadow: 0 0 28px rgb(255 59 59 / 0.9);
-	}
-}
-
-.hero-flash {
-	color: #ffcb05;
-	animation: oq-hero-flash 0.9s steps(1, end) infinite;
-}
-
-@media (prefers-reduced-motion: reduce) {
-	.hero-flash {
-		animation: none;
-	}
-}

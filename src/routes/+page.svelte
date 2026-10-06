@@ -22,7 +22,7 @@
 
 	<section class="py-12 text-center sm:py-20">
 		<h1 class="display text-4xl sm:text-6xl">
-			{#each titleParts as part, i (i)}{#if part.flash}<span class="hero-flash">{part.text}</span>{:else}{part.text}{/if}{/each}
+			{#each titleParts as part, i (i)}{#if part.flash}<span class="text-gradient">{part.text}</span>{:else}{part.text}{/if}{/each}
 		</h1>
 		<p class="mx-auto mt-4 max-w-xl text-lg text-oq-muted">{data.branding.heroTagline}</p>
 	</section>
