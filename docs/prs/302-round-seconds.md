@@ -18,3 +18,15 @@ The maximum stays 120 s (product owner). The default is now 45 s (`DEFAULT_SETTI
 ## Tests
 `src/tests/round-seconds.test.ts` (default 45, 120 accepted with 120000 ms round, 121 and 204 rejected) and `src/routes/round-seconds.e2e.ts` (type 90, click Start immediately, round is 90 s; typed 204 clamps to 120 with hint).
 - Blur of the number input only saves when it had to correct a value, so clicking Start is never swallowed by a disabled button.
+
+## Review (QA)
+Verdict: approved after one fix commit.
+
+Findings and fixes:
+- Race in `flush()`: two flushes waiting on the same in-flight save both fired PATCH requests in parallel, so an older draft could land last. Now saves are serialized (`while (inflight) await inflight`).
+- Failed save cleared `pending`, so the next SSE `settings_updated` overwrote the host's unsaved edit. `pending` now stays set until a save succeeds; `saving` is cleared so Start can retry, and Start refuses to start while the error is shown.
+- The e2e comment wrongly said "204 s round" and now says 90 s.
+- Checked: rapid slider drags (debounced, revision counter), typing (only valid values save, blur clamps), Start during debounce (button shows Saving, then flush), SSE during edits (ignored while pending).
+- UX: screenshots at 390x844 and 1366x900 show number inputs aligned with sliders, clamped value 120 and the hint visible under Start. No overflow.
+
+Verification: `pnpm check` 0 errors, `pnpm test:server` 45/45, `pnpm build` ok, `round-seconds.e2e.ts` 2/2 (on port 5541).
