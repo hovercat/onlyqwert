@@ -113,10 +113,19 @@ PORT=8080 node build
 
 Room state is held in memory in a single Node process, so run exactly one instance.
 
+### Docker
+
+A multi stage `Dockerfile` and `compose.yaml` are included (the image listens on port 3000; compose binds it to `127.0.0.1:3000` by default, override with `BIND`, `HOST_PORT` and `ORIGIN`):
+
+```sh
+docker compose up --build
+```
+
 ## Project structure
 
 ```
 assets/                  sprites and masks (private, served via tokens)
+Dockerfile, compose.yaml  container build
 docs/                    SPEC.md, BACKLOG.md, CREDITS.md, prs/, screenshots/
 scripts/                 asset pipeline (download, data, masks)
 src/lib/types.ts         shared contracts (settings, snapshot, SSE events)
