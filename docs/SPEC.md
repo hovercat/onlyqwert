@@ -29,7 +29,7 @@ type Phase = 'lobby' | 'round_active' | 'round_reveal' | 'leaderboard' | 'finish
 interface Settings {
   generations: number[];   // subset of 1..9, at least one
   rounds: number;          // 1..50, default 10
-  secondsPerRound: number; // 5..120, default 20
+  secondsPerRound: number; // 5..120, default 45
 }
 
 interface Player {
