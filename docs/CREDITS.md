@@ -8,7 +8,7 @@ Front sprites in `static/sprites/` come from the [PokeAPI/sprites](https://githu
 
 ## Names and data
 
-English species names are taken from the [PokeAPI](https://github.com/PokeAPI/pokeapi) CSV data (`pokemon_species_names.csv`), fetched by `scripts/build-pokemon-data.ts`.
+Localized species names (all languages in the CSV) are used as accepted guess aliases. English species names are taken from the [PokeAPI](https://github.com/PokeAPI/pokeapi) CSV data (`pokemon_species_names.csv`), fetched by `scripts/build-pokemon-data.ts`.
 
 ## Masks
 
