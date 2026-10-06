@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { onDestroy } from 'svelte';
-	import { api } from '#lib/client/api.ts';
+	import { api, loadLocal } from '#lib/client/api.ts';
 	import { RoomStore } from '#lib/client/room.svelte.ts';
 	import Brand from '#lib/components/Brand.svelte';
 	import GameView from '#lib/components/game/GameView.svelte';
@@ -40,6 +40,16 @@
 	}
 
 	const s = $derived(store.snapshot!);
+
+	// Hide the code in the header too while the host has streamer mode on.
+	let streamerMode = $state(false);
+	$effect(() => {
+		streamerMode = loadLocal('oq_streamer') === '1';
+		const onToggle = (e: Event) => (streamerMode = (e as CustomEvent<boolean>).detail);
+		window.addEventListener('oq-streamer', onToggle);
+		return () => window.removeEventListener('oq-streamer', onToggle);
+	});
+	const headerCode = $derived(s.you.isHost && streamerMode ? '••••••' : s.code);
 	const needsNick = $derived(!s.you.isHost && !s.you.playerId);
 	const statusLabel = $derived(
 		store.status === 'open' ? 'Live' : store.status === 'closed' ? 'Closed' : store.status === 'idle' ? '' : 'Reconnecting...'
@@ -49,9 +59,9 @@
 <svelte:head><title>Room {data.code} | itspikachu</title></svelte:head>
 
 <main class="mx-auto min-h-dvh w-full max-w-7xl px-4 py-4 sm:px-8">
-	<header class="mb-5 flex items-center justify-between gap-3">
+	<header class="mb-5 flex flex-wrap items-center justify-between gap-x-3 gap-y-2">
 		<Brand />
-		<div class="flex items-center gap-2">
+		<div class="ml-auto flex flex-wrap items-center justify-end gap-2">
 			{#if s.round && (s.phase === 'round_active' || s.phase === 'round_reveal')}
 				<span class="pill">Round {s.round.index + 1}/{s.round.total}</span>
 			{/if}
@@ -60,6 +70,7 @@
 					<span class="h-2 w-2 rounded-full {store.status === 'open' ? 'bg-oq-green' : 'bg-oq-red'}"></span>{statusLabel}
 				</span>
 			{/if}
+			<span class="pill display tracking-widest text-oq-yellow" aria-label="Room code">Room {headerCode}</span>
 		</div>
 	</header>
 

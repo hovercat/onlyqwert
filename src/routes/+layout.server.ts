@@ -6,6 +6,7 @@ export interface FooterLink {
 }
 
 export interface Branding {
+	brandName: string;
 	heroTitle: string;
 	heroTagline: string;
 	footerLinks: FooterLink[];
@@ -24,6 +25,7 @@ function parseLinks(raw: string | undefined): FooterLink[] {
 // Site specific copy comes from the environment so it stays out of the repo.
 export const load: LayoutServerLoad = () => {
 	const branding: Branding = {
+		brandName: process.env.SITE_BRAND_NAME?.trim() || 'onlyqwert',
 		heroTitle: process.env.SITE_HERO_TITLE?.trim() || 'Guess together, live.',
 		heroTagline:
 			process.env.SITE_HERO_TAGLINE?.trim() ||

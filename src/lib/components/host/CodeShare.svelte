@@ -14,6 +14,7 @@
 		streamer = !streamer;
 		revealed = false;
 		saveLocal('oq_streamer', streamer ? '1' : '0');
+		window.dispatchEvent(new CustomEvent('oq-streamer', { detail: streamer }));
 	}
 
 	async function copy(what: 'code' | 'link') {
