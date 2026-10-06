@@ -44,7 +44,7 @@
 		id="guess"
 		bind:this={input}
 		class="field !border-0 !bg-transparent text-lg"
-		placeholder={locked ? 'Nice one!' : active ? "Who's that Pokémon? Any language works" : 'Waiting...'}
+		placeholder={locked ? 'Nice one!' : active ? "Who's that Pokémon?" : 'Waiting...'}
 		autocomplete="off"
 		autocapitalize="off"
 		autocorrect="off"
