@@ -4,7 +4,7 @@ onlyqwert is a non commercial fan project. Pokémon and all related names and ar
 
 ## Sprites
 
-Front sprites in `static/sprites/` come from the [PokeAPI/sprites](https://github.com/PokeAPI/sprites) repository (`sprites/pokemon/{id}.png`). They are the original game artwork owned by their respective rights holders and are used here as fan content only. No Radical Red set with a stable, downloadable per id source was found, so PokeAPI sprites are used. Sprites are trimmed to their alpha bounds by `scripts/make-masks.ts`.
+Front sprites in `assets/sprites/` come from the [PokeAPI/sprites](https://github.com/PokeAPI/sprites) repository (`sprites/pokemon/{id}.png`). They are the original game artwork owned by their respective rights holders and are used here as fan content only. No Radical Red set with a stable, downloadable per id source was found, so PokeAPI sprites are used. Sprites are trimmed to their alpha bounds by `scripts/make-masks.ts`.
 
 ## Names and data
 

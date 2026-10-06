@@ -7,7 +7,7 @@ import { checkAllCorrect, currentRound } from './game';
 import { getPokemon } from './pokemon';
 import { touch } from './rooms';
 import { broadcastSnapshots, emit } from './sse';
-import { resolvePlayer } from './snapshot';
+import { resolvePlayer, revealOf } from './snapshot';
 import type { Player, Room } from './types';
 
 export type GuessOutcome = GuessResponse | { status: 'throttled' } | { status: 'unauthorized' };
@@ -65,5 +65,5 @@ export function submitGuess(
 	});
 	broadcastSnapshots(room);
 	checkAllCorrect(room);
-	return { status: 'correct', points };
+	return { status: 'correct', points, ...revealOf(room, round)! };
 }

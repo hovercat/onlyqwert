@@ -20,7 +20,7 @@ These files are FROZEN for the sprint. If a stream needs a change, it opens a se
 
 | Stream | Owns |
 |---|---|
-| A assets | `static/sprites/**`, `assets/masks/**`, `src/lib/data/**`, `scripts/**`, `docs/CREDITS.md` |
+| A assets | `assets/sprites/**`, `assets/masks/**`, `src/lib/data/**`, `scripts/**`, `docs/CREDITS.md` |
 | B backend | `src/lib/server/**` (except `types.ts`), `src/routes/api/**`, `src/hooks.server.ts` |
 | C frontend | `src/routes/+layout.svelte`, `src/routes/+page.svelte`, `src/routes/layout.css`, `src/routes/itspikachu/**`, `src/lib/components/**`, `src/lib/client/**`, `src/lib/styles/**`, `src/app.css`, `src/app.html`, `static/` (except sprites) |
 | D tests | `src/tests/**` (Vitest specs), `e2e/**` (Playwright `*.e2e.ts`), `playwright.config.ts`, deletion of `src/lib/vitest-examples/**` and `src/routes/page.svelte.e2e.ts` |
@@ -40,7 +40,7 @@ export function isHost(room: Room, hostToken: string | undefined): boolean;
 Stream B MUST export from `src/lib/server/pokemon.ts`: `getPokemon(id): PokemonEntry | undefined` reading `src/lib/data/pokemon.json`.
 Until A merges, B may commit nothing to `src/lib/data/`; instead B's tests (D) use a fixture. A guarantees the JSON shape `PokemonEntry[]`.
 
-Mask URL format: `/api/rooms/{CODE}/mask/{maskToken}`. Sprite URL format: `/sprites/{id}.png`.
+Mask URL format: `/api/rooms/{CODE}/mask/{maskToken}`. Sprite URL format: `/api/rooms/{CODE}/sprite/{spriteToken}`.
 
 Client SSE: C connects with `new EventSource('/api/rooms/{code}/events')` and listens per `SseEventType` name; `data` is JSON of `SseData<type>`. Clock offset = `serverNow - Date.now()`.
 
@@ -56,7 +56,7 @@ Acceptance:
 3. Aliases: Nidoran♀ `['nidoranf','nidoran']`, Nidoran♂ `['nidoranm','nidoran']`; other useful aliases (e.g. `Type: Null` → `typenull`) where normalization alone is insufficient.
 
 ### A2 Sprites
-Files: `scripts/fetch-sprites.ts`, `static/sprites/{id}.png`, `docs/CREDITS.md`.
+Files: `scripts/fetch-sprites.ts`, `assets/sprites/{id}.png`, `docs/CREDITS.md`.
 Acceptance:
 1. Gen 3 / Radical Red style front sprites where available, fallback `PokeAPI/sprites` repo; one PNG per id 1..1025.
 2. Trimmed to content bounds, transparent background, nearest neighbour scaled to a consistent size (e.g. 96 or 192 px max side).
