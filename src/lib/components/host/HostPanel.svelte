@@ -40,16 +40,17 @@
 	/** Sends any pending edit now and waits for it (and any in-flight save). Resolves true when the server has the draft. */
 	async function flush(): Promise<boolean> {
 		clearTimeout(timer);
-		const prev = inflight;
-		if (prev) await prev;
+		// Serialize saves so a later PATCH can never be overtaken by an earlier one.
+		while (inflight) await inflight;
 		const r = rev;
 		const p = doSave();
 		inflight = p;
 		const ok = await p;
 		if (inflight === p) inflight = null;
 		if (rev === r) {
-			pending = false;
 			saving = false;
+			// Keep the draft protected from SSE resyncs until the server actually has it.
+			if (ok) pending = false;
 		}
 		return ok;
 	}

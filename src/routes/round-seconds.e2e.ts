@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 
-// Regression: typing 90 seconds and pressing Start right away must start a 204 s round.
+// Regression: typing 90 seconds and pressing Start right away must start a 90 s round.
 test('typed seconds are saved before Start and used for the round', async ({ page, browser }) => {
 	await page.goto('/itspikachu');
 	await page.getByRole('button', { name: /create room/i }).first().click();
