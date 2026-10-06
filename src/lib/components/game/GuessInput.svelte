@@ -28,8 +28,10 @@
 		input?.focus({ preventScroll: true });
 	});
 
+	let composing = false;
+
 	async function send() {
-		if (locked || !active || !value.trim()) return;
+		if (composing || locked || !active || !value.trim()) return;
 		const res = await api<GuessResponse>('POST', `/api/rooms/${code}/guess`, { value, round });
 		const d = res.data;
 		if (res.ok && d && d.status === 'correct') onscored(d as CorrectGuessResult);
@@ -42,16 +44,24 @@
 		id="guess"
 		bind:this={input}
 		class="field !border-0 !bg-transparent text-lg"
-		placeholder={locked ? 'Nice one!' : active ? "Who's that Pokémon?" : 'Waiting...'}
+		placeholder={locked ? 'Nice one!' : active ? "Who's that Pokémon? Any language works" : 'Waiting...'}
 		autocomplete="off"
-		autocapitalize="none"
+		autocapitalize="off"
 		autocorrect="off"
 		spellcheck="false"
 		enterkeyhint="send"
 		disabled={locked || !active}
 		bind:value
-		oninput={send}
-		onkeydown={(e) => e.key === 'Enter' && send()}
+		oninput={(e) => {
+			if (e.isComposing) return;
+			send();
+		}}
+		oncompositionstart={() => (composing = true)}
+		oncompositionend={() => {
+			composing = false;
+			send();
+		}}
+		onkeydown={(e) => e.key === 'Enter' && !e.isComposing && send()}
 	/>
 	{#if locked && points !== null}
 		<span class="badge-delta display mr-2 text-lg" role="status">+{points}</span>

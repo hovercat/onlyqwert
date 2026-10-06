@@ -17,7 +17,7 @@ Complete frontend: theme, landing, itspikachu entry, room page (nickname gate, l
 2. `scoreboard` event (or `game_finished`) follows `round_ended`; phase switches to leaderboard/finished only after 4 s of reveal on the client.
 3. Restart (finished to lobby) is followed by a snapshot (client also refetches the snapshot after POST restart for the host). Players rely on an SSE `snapshot` being pushed.
 4. Host with `hostPlays` has `you.playerId` in the snapshot. `prevRank <= 0` is treated as `rank`.
-5. Guess POSTs fire on every input event (non empty values only).
+5. Guess POSTs fire on every non composing input event and on compositionend (IME friendly, no maxlength, any language).
 6. Imports: routes use `#lib/...` with explicit extensions; files in `src/lib` use relative imports.
 
 ## Dependencies
