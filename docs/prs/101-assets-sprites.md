@@ -17,3 +17,16 @@ Adds Pokémon data (national dex 1..1025), front sprites, silhouette masks and t
 - Re running `npm run assets:masks` leaves files unchanged in dimensions.
 - Spot check ids 25, 29, 32, 83, 122, 772, 1025 in `pokemon.json`.
 - Mask pixels contain only color `11,8,32` (alpha 0 or 255).
+
+## Review
+Verdict: **Approved, merged.**
+
+Checked:
+- Diff touches only stream A files (scripts, data, sprites, masks, CREDITS, PR doc, npm scripts in package.json).
+- 1025 sprites in `static/sprites/`, 1025 masks in `assets/masks/` (outside `static/`).
+- All masks contain only `rgb(11,8,32)` with alpha 0 or 255; no color or id leak. A few PNGs carry a harmless DPI chunk only.
+- `pokemon.json`: 1025 entries, ids sequential, every generation matches the id ranges. Spot checks OK: Nidoran♀/♂ (with aliases), Farfetch'd, Mr. Mime, Mew (151, gen 1), Chikorita (152, gen 2), Flabébé, Type: Null, Pecharunt (1025, gen 9).
+- Scripts only fetch from PokeAPI GitHub raw URLs, validate PNGs, write to fixed project paths. Safe.
+- `npm run check`: 0 errors, 0 warnings. No em dashes.
+
+Minor deviations accepted (no action needed): script is `download-sprites.ts` instead of `fetch-sprites.ts`; npm script is `assets:masks` instead of `masks`; sprites are trimmed but not rescaled to a fixed size (frontend should scale with `image-rendering: pixelated`); PokeAPI sprites used instead of Radical Red, documented in CREDITS. Note `Type: Null` has no explicit alias; guess normalization must strip punctuation and spaces.
