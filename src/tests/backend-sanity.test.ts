@@ -109,3 +109,17 @@ describe('teardown', () => {
 		expect(vi.getTimerCount()).toBe(before);
 	});
 });
+
+describe('scoring floor via submitGuess', () => {
+	it('awards 50 at endsAt - 1 and nothing at endsAt', () => {
+		const { room, ann } = setup();
+		const bob = joinRoom(room, 'Bob');
+		if (!bob.ok) throw new Error(bob.error);
+		expect(startGame(room).ok).toBe(true);
+		const round = room.rounds[0];
+		const name = getPokemon(round.pokemonId)!.name;
+		expect(submitGuess(room, ann.token, name, 0, round.endsAt - 1)).toMatchObject({ status: 'correct', points: 50 });
+		expect(submitGuess(room, bob.value.token, name, 0, round.endsAt)).toEqual({ status: 'not_active' });
+		expect(bob.value.score).toBe(0);
+	});
+});

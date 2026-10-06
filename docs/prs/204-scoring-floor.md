@@ -16,3 +16,11 @@ No frontend file was edited. A grep of `src/routes` and `src/lib` found no hard 
 
 ## Verification
 `pnpm check` 0 errors; `pnpm exec vitest --run --project server` 29 passed.
+
+## Review
+Reviewer/QA: approved.
+- `calculateScore` matches the requirement: 50 + round(50 * timeLeft / duration), clamped to 50..100; degenerate duration returns the floor.
+- `submitGuess` rejects `at >= endsAt` with `not_active` before scoring, so nothing is awarded at or after the deadline. Points are summed into `score` in `game.ts`; `rankPlayers` tie breaks (score, earlier correct time, name) are unaffected.
+- SPEC section 5 item 3 and BACKLOG D1 updated consistently.
+- Added (review commit): integration test in `backend-sanity.test.ts` asserting a correct guess at `endsAt - 1` gets 50 and one at exactly `endsAt` is `not_active` with score unchanged.
+- Merged main into the branch before merge (already up to date). `pnpm check` 0 errors, server tests 30 passed.
