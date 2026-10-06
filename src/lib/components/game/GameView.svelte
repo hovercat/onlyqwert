@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { CorrectGuessResult, RoomStore } from '../../client/room.svelte';
+	import type { Reveal } from '../../types';
 	import PlayerList from '../lobby/PlayerList.svelte';
 	import CorrectFeed from './CorrectFeed.svelte';
 	import GuessInput from './GuessInput.svelte';
@@ -13,15 +14,17 @@
 	const myCorrect = $derived(store.correct.find((c) => c.playerId === store.playerId));
 	let localPoints = $state<{ round: number; points: number } | null>(null);
 	// Personal early reveal after the local player guessed correctly (others still see the silhouette).
-	let mine = $state<{ round: number; name: string; generation: number; spriteUrl: string } | null>(null);
-	const personal = $derived(mine && mine.round === round.index ? mine : null);
+	let mine = $state<{ round: number; reveal: Reveal } | null>(null);
+	const personal = $derived(mine && mine.round === round.index ? mine.reveal : null);
 	function scored(r: CorrectGuessResult) {
 		localPoints = { round: round.index, points: r.points };
-		if (r.spriteUrl && r.pokemon) mine = { round: round.index, name: r.pokemon.name, generation: r.pokemon.generation, spriteUrl: r.spriteUrl };
+		mine = { round: round.index, reveal: { pokemon: r.pokemon, spriteUrl: r.spriteUrl } };
 	}
-	const revealed = $derived((s.phase !== 'round_active' && s.revealed !== null) || (s.phase === 'round_active' && personal !== null));
+	// Snapshot reveal (round over, or viewer already correct mid round) or the personal one from the guess response.
 	// The server provided spriteUrl is always used as is; ids are never handled client side.
-	const shownSprite = $derived(s.revealed ? { url: s.revealed.spriteUrl, name: s.revealed.pokemon.name, generation: s.revealed.pokemon.generation } : personal ? { url: personal.spriteUrl, name: personal.name, generation: personal.generation } : null);
+	const reveal = $derived(s.revealed ?? personal);
+	const revealed = $derived(reveal !== null);
+	const shownSprite = $derived(reveal ? { url: reveal.spriteUrl, name: reveal.pokemon.name, generation: reveal.pokemon.generation } : null);
 	const points = $derived(myCorrect?.points ?? (localPoints?.round === round.index ? localPoints.points : null));
 	const locked = $derived(points !== null);
 	const canPlay = $derived(!!store.playerId);

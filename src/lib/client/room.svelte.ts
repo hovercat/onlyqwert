@@ -2,6 +2,7 @@ import { LIMITS } from '../types';
 import type {
 	CorrectEntry,
 	PublicPlayer,
+	GuessResponse,
 	RoomSnapshot,
 	ScoreboardPlayer,
 	SseData,
@@ -16,13 +17,8 @@ export interface FeedItem {
 	order: number;
 }
 
-/** Correct guess response; pokemon and spriteUrl are added by the anti cheat contract (optional until types.ts is updated). */
-export interface CorrectGuessResult {
-	status: 'correct';
-	points: number;
-	pokemon?: { name: string; generation: number };
-	spriteUrl?: string;
-}
+/** Correct guess response (server contract, includes the reveal). */
+export type CorrectGuessResult = Extract<GuessResponse, { status: 'correct' }>;
 
 const EVENT_TYPES: SseEventType[] = [
 	'snapshot',
