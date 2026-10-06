@@ -12,7 +12,10 @@
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
 		"test:unit": "vitest",
 		"test": "npm run test:unit -- --run && npm run test:e2e",
-		"test:e2e": "playwright install && playwright test"
+		"test:e2e": "playwright install && playwright test",
+		"assets:data": "node scripts/build-pokemon-data.ts",
+		"assets:download": "node scripts/download-sprites.ts",
+		"assets:masks": "node scripts/make-masks.ts"
 	},
 	"devDependencies": {
 		"@playwright/test": "^1.60.0",
