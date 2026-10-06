@@ -18,6 +18,11 @@ export default defineConfig({
 	],
 	test: {
 		expect: { requireAssertions: true },
+		coverage: {
+			provider: 'v8',
+			include: ['src/lib/server/**', 'src/lib/game/**', 'src/routes/api/**'],
+			reporter: ['text', 'html']
+		},
 		projects: [
 			{
 				extends: './vite.config.ts',
