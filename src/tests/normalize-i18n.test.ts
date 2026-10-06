@@ -78,7 +78,7 @@ describe('guess endpoint level', () => {
 		expect(startGame(room).ok).toBe(true);
 		room.rounds[0].pokemonId = 6;
 		vi.advanceTimersByTime(5000);
-		expect(submitGuess(room, a.value.token, 'Glurak', 0)).toEqual({ status: 'correct', points: 50 });
+		expect(submitGuess(room, a.value.token, 'Glurak', 0)).toMatchObject({ status: 'correct', points: 50, pokemon: { name: 'Charizard', generation: 1 } });
 	});
 });
 
