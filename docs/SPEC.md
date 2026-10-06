@@ -16,7 +16,7 @@ onlyqwert is a website offering games a streamer (the **host**) plays together w
 | Route | Purpose |
 |---|---|
 | `/` | Landing page listing available games (only itspikachu for now, more as "coming soon" cards). |
-| `/itspikachu` | Two panels: **Host a room** (create button) and **Join a room** (code + nickname). |
+| `/itspikachu` | Two panels: **Host a room** (name field prefilled "Host", create button) and **Join a room** (code + nickname). |
 | `/itspikachu/[code]` | Lobby, game and results for one room. Renders host controls when the request carries a valid host token cookie, otherwise the player view. If the visitor has not joined yet, shows a nickname form first. |
 
 Room codes: 6 characters from `ABCDEFGHJKLMNPQRSTUVWXYZ23456789` (no ambiguous chars), case insensitive input, uppercase canonical form.
@@ -55,6 +55,7 @@ interface Round {
 interface Room {
   code: string;
   hostToken: string;       // httpOnly cookie `oq_host_<code>`
+  hostName: string;        // display name when the host plays, validated like player names, default "Host"
   settings: Settings;
   phase: Phase;
   players: Map<string, Player>;
@@ -65,7 +66,7 @@ interface Room {
 }
 ```
 
-The host is not a player by default. Setting `hostPlays: boolean` (default `true`) lets the streamer also guess; in that case the host gets a Player entry too.
+The host is not a player by default. Setting `hostPlays: boolean` (default `true`) lets the streamer also guess; in that case the host gets a Player entry too, named `hostName` (set at room creation, default "Host"; renaming the host player updates `hostName`, so toggling `hostPlays` later reuses it).
 
 ## 4. Game flow (state machine)
 
@@ -104,9 +105,10 @@ All bodies are JSON. Errors are `{ error: string }` with appropriate status. Aut
 
 | Method & path | Auth | Body | Response |
 |---|---|---|---|
-| `POST /api/rooms` | none | `{ settings?: Partial<Settings> }` | `201 { code }`, sets host cookie |
+| `POST /api/rooms` | none | `{ settings?: Partial<Settings>, hostName?: string }` | `201 { code }`, sets host cookie. 400 invalid `hostName` (same rules as player names) |
 | `GET /api/rooms/[code]` | none | | `200 RoomSnapshot` or 404 |
 | `POST /api/rooms/[code]/join` | none | `{ name }` | `201 { playerId }`, sets player cookie. 404 unknown room, 409 name taken, 400 invalid name, 409 if phase is `finished` |
+| `PATCH /api/rooms/[code]/me` | player (or host who plays) | `{ name }` | `200 { name }`; renames the caller only. 401 no identity, 409 not in lobby or name taken (case insensitive), 400 invalid name |
 | `PATCH /api/rooms/[code]/settings` | host | `Partial<Settings>` | `200 { settings }`; 403 not host; 409 if not in lobby; 400 invalid values |
 | `POST /api/rooms/[code]/start` | host | | `200`; 409 if not lobby or no players |
 | `POST /api/rooms/[code]/next` | host | | `200`; advances leaderboard → next round / finished |
@@ -127,6 +129,7 @@ Each message: `event: <type>` and `data: JSON` including `serverNow`. On connect
 |---|---|
 | `snapshot` | `RoomSnapshot` |
 | `player_joined` / `player_left` | `{ player }` / `{ playerId }` |
+| `player_renamed` | `{ playerId, name }` (a fresh `snapshot` follows) |
 | `settings_updated` | `{ settings }` |
 | `round_started` | `{ index, total, maskUrl, startedAt, endsAt }` |
 | `player_correct` | `{ playerId, name, points, order }` |

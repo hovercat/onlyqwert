@@ -3,10 +3,12 @@
 	import type { RoomStore } from '../../client/room.svelte';
 	import CodeShare from '../host/CodeShare.svelte';
 	import HostPanel from '../host/HostPanel.svelte';
+	import NameEditor from './NameEditor.svelte';
 	import PlayerList from './PlayerList.svelte';
 
 	let { store, code }: { store: RoomStore; code: string } = $props();
 	const s = $derived(store.snapshot!);
+	const me = $derived(s.players.find((p) => p.id === store.playerId));
 
 	function kick(playerId: string) {
 		api('POST', `/api/rooms/${code}/kick`, { playerId });
@@ -24,6 +26,8 @@
 				<p class="mt-2 text-oq-muted">Waiting for the host to start...</p>
 			</section>
 		{/if}
+
+		{#if me}<NameEditor {code} name={me.name} />{/if}
 
 		<section>
 			<h2 class="display mb-3 text-xl">Players <span class="text-oq-blue">{s.players.length}</span></h2>

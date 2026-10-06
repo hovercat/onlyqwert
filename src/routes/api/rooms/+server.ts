@@ -6,7 +6,7 @@ import { errorJson, readBody, setAuthCookie } from '#lib/server/http.ts';
 
 export const POST: RequestHandler = async ({ request, cookies }) => {
 	const body = await readBody(request);
-	const result = createRoom(body.settings);
+	const result = createRoom(body.settings, body.hostName);
 	if (!result.ok) return errorJson(result.status, result.error);
 	const room = result.value;
 	setAuthCookie(cookies, hostCookieName(room.code), room.hostToken);

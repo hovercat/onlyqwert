@@ -31,6 +31,8 @@ export interface Room {
 	/** httpOnly cookie oq_host_<code> */
 	hostToken: string;
 	hostPlayerId?: string;
+	/** display name used when the host plays (default "Host") */
+	hostName: string;
 	settings: Settings;
 	phase: Phase;
 	players: Map<string, Player>;

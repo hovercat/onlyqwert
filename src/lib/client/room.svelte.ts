@@ -24,6 +24,7 @@ const EVENT_TYPES: SseEventType[] = [
 	'snapshot',
 	'player_joined',
 	'player_left',
+	'player_renamed',
 	'settings_updated',
 	'round_started',
 	'player_correct',
@@ -205,6 +206,11 @@ export class RoomStore {
 			case 'player_left': {
 				const { playerId } = data as SseData<'player_left'>;
 				s.players = s.players.map((p) => (p.id === playerId ? { ...p, connected: false } : p));
+				break;
+			}
+			case 'player_renamed': {
+				const { playerId, name } = data as SseData<'player_renamed'>;
+				s.players = s.players.map((p) => (p.id === playerId ? { ...p, name } : p));
 				break;
 			}
 			case 'settings_updated':

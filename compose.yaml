@@ -1,0 +1,11 @@
+services:
+  app:
+    build: .
+    restart: unless-stopped
+    environment:
+      ORIGIN: ${ORIGIN:-http://localhost:3000}
+      # Behind a reverse proxy (Caddy) that sets X-Forwarded-For
+      ADDRESS_HEADER: X-Forwarded-For
+      XFF_DEPTH: "1"
+    ports:
+      - "${BIND:-127.0.0.1}:${HOST_PORT:-3000}:3000"
