@@ -1,9 +1,15 @@
-/** points = round(100 * (endsAt - now) / (endsAt - startedAt)) clamped to [1, 100]. */
+/**
+ * points = 50 + round(50 * timeLeft / duration), range 50..100.
+ * 100 at the instant the round starts, 50 at the last ms. Guaranteed floor of 50 for any correct guess.
+ * now < startedAt (clock skew) clamps to 100. Callers must not score guesses at/after endsAt (not_active).
+ */
+export const SCORE_FLOOR = 50;
+export const SCORE_MAX = 100;
 export function calculateScore(startedAt: number, endsAt: number, now: number): number {
 	const total = endsAt - startedAt;
-	if (total <= 0) return 1;
-	const raw = Math.round((100 * (endsAt - now)) / total);
-	return Math.min(100, Math.max(1, raw));
+	if (total <= 0) return SCORE_FLOOR;
+	const fraction = Math.min(1, Math.max(0, (endsAt - now) / total));
+	return SCORE_FLOOR + Math.round((SCORE_MAX - SCORE_FLOOR) * fraction);
 }
 
 export interface RankInput {
