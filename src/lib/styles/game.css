@@ -1,0 +1,55 @@
+/* Countdown ring */
+.cd-ring { position: relative; width: 100%; aspect-ratio: 1; }
+.cd-ring svg { position: absolute; inset: 0; width: 100%; height: 100%; transform: rotate(-90deg); overflow: visible; }
+.cd-ring .track { stroke: rgb(255 255 255 / 0.12); }
+.cd-ring .bar { stroke: var(--color-oq-blue); transition: stroke 0.3s; filter: drop-shadow(0 0 6px rgb(46 196 255 / 0.7)); }
+.cd-ring.warn .bar { stroke: var(--color-oq-yellow); filter: drop-shadow(0 0 6px rgb(255 203 5 / 0.7)); }
+.cd-ring.urgent .bar { stroke: var(--color-oq-red); }
+.cd-ring.urgent { animation: oq-pulse 0.8s ease-in-out infinite; }
+.cd-ring .secs {
+	position: absolute; right: 4%; top: 4%;
+	min-width: 3rem; text-align: center;
+	padding: 0.1rem 0.6rem; border-radius: 9999px;
+	font-family: var(--font-display); font-size: 1.4rem;
+	background: rgb(10 7 32 / 0.85); border: 2px solid var(--color-oq-blue);
+	z-index: 2;
+}
+.cd-ring.urgent .secs { border-color: var(--color-oq-red); color: #ffd0d8; }
+
+/* Stage: bright backdrop so dark masks are visible */
+.stage {
+	position: absolute; inset: 9%;
+	border-radius: 9999px; overflow: hidden;
+	background: radial-gradient(circle at 50% 40%, #fff6c2 0%, var(--color-oq-yellow) 38%, #3aa8ff 100%);
+	box-shadow: inset 0 0 40px rgb(26 16 80 / 0.5);
+}
+.stage img { position: absolute; inset: 12%; width: 76%; height: 76%; object-fit: contain; transition: opacity 0.7s ease; }
+.stage .flash { position: absolute; inset: 0; background: #fff; opacity: 0; pointer-events: none; }
+.stage.revealed .flash { animation: oq-flash-white 0.8s ease-out; }
+.stage img.sprite { opacity: 0; transform: scale(0.9); transition: opacity 0.7s ease, transform 0.7s var(--ease-elastic); }
+.stage.revealed img.sprite { opacity: 1; transform: scale(1); }
+.stage.revealed img.mask { opacity: 0; }
+
+/* Guess input */
+.guess { transition: background 0.3s; }
+.guess.correct { animation: oq-flash-green 0.9s ease-out forwards; border-color: var(--color-oq-green); }
+.guess-bar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 30; padding: 0.75rem 1rem calc(0.75rem + env(safe-area-inset-bottom)); background: linear-gradient(180deg, transparent, rgb(10 7 32 / 0.92) 35%); }
+@media (min-width: 1024px) {
+	.guess-bar { position: static; padding: 0; background: none; }
+}
+
+/* Feed + cards */
+.feed-item { display: flex; align-items: center; gap: 0.6rem; padding: 0.5rem 0.75rem; border-radius: 0.9rem; background: rgb(61 245 138 / 0.12); border: 1px solid rgb(61 245 138 / 0.4); }
+.medal { display: inline-grid; place-items: center; width: 1.75rem; height: 1.75rem; border-radius: 9999px; font-weight: 800; font-size: 0.85rem; color: #1a1050; background: #cfc8ef; flex: none; }
+.medal.m1 { background: #ffcb05; } .medal.m2 { background: #d9dde8; } .medal.m3 { background: #e7a068; }
+.badge-delta { animation: oq-pop 0.5s var(--ease-elastic) both; background: var(--color-oq-green); color: #04230f; border-radius: 9999px; padding: 0.1rem 0.55rem; font-weight: 800; font-size: 0.85rem; }
+.card-row { display: flex; align-items: center; gap: 0.75rem; padding: 0.7rem 1rem; }
+.card-row.me { border-color: var(--color-oq-yellow); box-shadow: 0 0 0 2px rgb(255 203 5 / 0.5), 0 10px 40px -12px rgb(0 0 0 / 0.6); }
+.rank-num { font-family: var(--font-display); font-size: 1.5rem; width: 2.2rem; text-align: center; color: var(--color-oq-yellow); }
+.up { color: var(--color-oq-green); } .down { color: var(--color-oq-red); } .same { color: var(--color-oq-muted); }
+
+/* Podium */
+.podium-col { animation: oq-rise 0.9s var(--ease-elastic) both; border-radius: 1rem 1rem 0 0; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; padding-top: 0.75rem; }
+.podium-col.p1 { height: 11rem; background: linear-gradient(180deg, #ffcb05, #b78a00); color: #1a1050; animation-delay: 0.5s; }
+.podium-col.p2 { height: 8rem; background: linear-gradient(180deg, #dfe3ee, #8c93ab); color: #1a1050; animation-delay: 0.25s; }
+.podium-col.p3 { height: 6rem; background: linear-gradient(180deg, #f0b07a, #9a5c2b); color: #1a1050; animation-delay: 0s; }
