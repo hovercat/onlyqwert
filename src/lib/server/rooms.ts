@@ -1,4 +1,5 @@
 import { DEFAULT_SETTINGS, LIMITS } from '../types';
+import { isOffensiveName } from './nameFilter';
 import type { Settings } from '../types';
 import { generateRoomCode, normalizeCode } from './codes';
 import { now } from './clock';
@@ -63,6 +64,7 @@ export function validateName(raw: unknown): string | { error: string } {
 	const len = [...name].length;
 	if (len < LIMITS.nameMin || len > LIMITS.nameMax)
 		return { error: `name must be ${LIMITS.nameMin}..${LIMITS.nameMax} characters` };
+	if (isOffensiveName(name)) return { error: 'That name is not allowed. Please pick another one.' };
 	return name;
 }
 
