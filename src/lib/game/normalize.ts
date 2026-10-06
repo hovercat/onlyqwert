@@ -17,12 +17,24 @@ export function normalizeName(value: string): string {
 		.replace(/[^\p{L}\p{N}]/gu, '');
 }
 
+/**
+ * Empty strings never match. A single character only matches when it is a whole
+ * Hangul syllable or Han ideograph (e.g. Korean Mew 뮤, Cleffa 삐), never a lone Latin
+ * letter or kana.
+ */
+export function isMatchable(v: string): boolean {
+	const chars = [...v];
+	if (chars.length === 0) return false;
+	if (chars.length === 1) return /[\p{Script=Hangul}\p{Script=Han}]/u.test(v);
+	return true;
+}
+
 /** Normalized set of all accepted spellings for one Pokemon. */
 export function buildAcceptedSet(name: string, aliases: readonly string[] = []): Set<string> {
 	const set = new Set<string>();
 	for (const n of [name, ...aliases]) {
 		const v = normalizeName(n);
-		if (v) set.add(v);
+		if (isMatchable(v)) set.add(v);
 	}
 	return set;
 }
@@ -30,6 +42,6 @@ export function buildAcceptedSet(name: string, aliases: readonly string[] = []):
 /** True if value matches the name or one of the aliases after normalization. */
 export function isCorrectGuess(value: string, name: string, aliases: string[] = []): boolean {
 	const v = normalizeName(value);
-	if (!v) return false;
+	if (!isMatchable(v)) return false;
 	return buildAcceptedSet(name, aliases).has(v);
 }

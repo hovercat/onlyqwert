@@ -1,9 +1,9 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { isCorrectGuess, normalizeName } from '#lib/game/normalize.ts';
+import { buildAcceptedSet, isCorrectGuess, normalizeName } from '#lib/game/normalize.ts';
 import { __resetRooms, createRoom, joinRoom } from '#lib/server/rooms.ts';
 import { startGame } from '#lib/server/game.ts';
 import { submitGuess } from '#lib/server/guess.ts';
-import { getPokemon } from '#lib/server/pokemon.ts';
+import { getAllPokemon, getPokemon } from '#lib/server/pokemon.ts';
 
 function ok(guess: string, id: number) {
 	const p = getPokemon(id)!;
@@ -79,5 +79,25 @@ describe('guess endpoint level', () => {
 		room.rounds[0].pokemonId = 6;
 		vi.advanceTimersByTime(5000);
 		expect(submitGuess(room, a.value.token, 'Glurak', 0)).toEqual({ status: 'correct', points: 50 });
+	});
+});
+
+describe('alias safety across the dataset', () => {
+	it('never collapses two different Pokemon into one name (except Nidoran female/male)', () => {
+		const owner = new Map<string, number>();
+		const clashes: string[] = [];
+		for (const p of getAllPokemon()) {
+			for (const v of buildAcceptedSet(p.name, p.aliases)) {
+				const prev = owner.get(v);
+				if (prev !== undefined && prev !== p.id && !(prev === 29 && p.id === 32)) clashes.push(`${v}: ${prev}/${p.id}`);
+				owner.set(v, p.id);
+			}
+		}
+		expect(clashes).toEqual([]);
+	});
+	it('rejects empty and single Latin or kana guesses', () => {
+		for (const g of ['', '   ', '!!', '♀', '・', 'a', 'Ａ', 'é', 'ぴ']) expect(ok(g, 151), g).toBe(false);
+		expect(ok('뮤', 151)).toBe(true);
+		expect(ok('뮤', 25)).toBe(false);
 	});
 });
