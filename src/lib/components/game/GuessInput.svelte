@@ -53,7 +53,7 @@
 		disabled={locked || !active}
 		bind:value
 		oninput={(e) => {
-			if ((e as InputEvent).isComposing) return;
+			if ((e as unknown as InputEvent).isComposing) return;
 			send();
 		}}
 		oncompositionstart={() => (composing = true)}
