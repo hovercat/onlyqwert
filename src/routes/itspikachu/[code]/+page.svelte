@@ -70,7 +70,7 @@
 					<span class="h-2 w-2 rounded-full {store.status === 'open' ? 'bg-oq-green' : 'bg-oq-red'}"></span>{statusLabel}
 				</span>
 			{/if}
-			<span class="pill display tracking-widest text-oq-yellow" aria-label="Room code">Room {headerCode}</span>
+			<span class="pill display !px-4 !py-1.5 !text-xl tracking-widest text-oq-yellow sm:!text-3xl" aria-label="Room code">Room {headerCode}</span>
 		</div>
 	</header>
 
