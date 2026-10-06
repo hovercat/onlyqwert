@@ -89,8 +89,8 @@ All timers run on the server. Clients render countdowns from `endsAt` with a clo
 
 ## 5. Guessing and scoring
 
-1. Normalization (`normalizeName`): lowercase, Unicode NFD then strip diacritics, remove everything except `a-z0-9`. Examples: `Mr. Mime` → `mrmime`, `Flabébé` → `flabebe`, `Farfetch'd` → `farfetchd`, `Nidoran♀` → `nidoran` (both Nidorans accept `nidoran`, `nidoranf`/`nidoranm`).
-2. A guess is correct if `normalizeName(value) === normalizeName(answer)` or matches one of the Pokémon's listed aliases.
+1. Normalization (`normalizeName`): Unicode NFKC (fullwidth to halfwidth), locale independent lowercase, `ß` to `ss`, diacritics stripped on Latin letters only (Hangul and kana voicing marks are kept), katakana folded to hiragana, then everything except letters and digits (`\p{L}\p{N}`) removed, including whitespace, punctuation, symbols and middle dots. Examples: `Mr. Mime` → `mrmime`, `Flabébé` → `flabebe`, `Farfetch'd` → `farfetchd`, `Nidoran♀` → `nidoran`, `ピカチュウ` and `ぴかちゅう` are equal.
+2. A guess is correct if its normalized form equals the normalized English name or any alias. Aliases hold every localized species name from PokeAPI (de, fr, es, it, ja, ja-Hrkt, roomaji, ko, zh-Hans, zh-Hant, ...) plus `nidoranf`/`nidoranm`. The server precomputes a normalized `Set` per Pokémon and caches it.
 3. Score: `points = Math.round(100 * (endsAt - now) / (endsAt - startedAt))`, clamped to `[1, 100]` for a correct guess during an active round.
 4. A player can score at most once per round. After a correct guess, further guesses for that round are ignored (response `{ status: 'already_correct' }`).
 5. Guesses outside `round_active`, or arriving after `endsAt` (server clock), are rejected with `{ status: 'not_active' }`.

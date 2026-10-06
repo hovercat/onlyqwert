@@ -1,4 +1,4 @@
-import { isCorrectGuess } from '../game/normalize';
+import { buildAcceptedSet, normalizeName } from '../game/normalize';
 import { calculateScore } from '../game/scoring';
 import { LIMITS } from '../types';
 import type { GuessResponse } from '../types';
@@ -11,6 +11,18 @@ import { resolvePlayer, revealOf } from './snapshot';
 import type { Player, Room } from './types';
 
 export type GuessOutcome = GuessResponse | { status: 'throttled' } | { status: 'unauthorized' };
+
+const accepted = new WeakMap<object, Set<string>>();
+
+/** Normalized accepted names per Pokemon entry, computed once. */
+function acceptedFor(entry: { name: string; aliases?: string[] }): Set<string> {
+	let set = accepted.get(entry);
+	if (!set) {
+		set = buildAcceptedSet(entry.name, entry.aliases);
+		accepted.set(entry, set);
+	}
+	return set;
+}
 
 const recent = new WeakMap<Player, number[]>();
 
@@ -53,7 +65,7 @@ export function submitGuess(
 	}
 	if (round.correct.some((c) => c.playerId === player.id)) return { status: 'already_correct' };
 	const entry = getPokemon(round.pokemonId);
-	if (!entry || !isCorrectGuess(value.slice(0, 100), entry.name, entry.aliases)) return { status: 'wrong' };
+	if (!entry || !acceptedFor(entry).has(normalizeName(value.slice(0, 100)))) return { status: 'wrong' };
 	const points = calculateScore(round.startedAt, round.endsAt, at);
 	round.correct.push({ playerId: player.id, points, at });
 	touch(room);
