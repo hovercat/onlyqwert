@@ -113,6 +113,7 @@ export type SseEvent =
 	| { type: 'snapshot'; data: RoomSnapshot }
 	| { type: 'player_joined'; data: WithNow<{ player: PublicPlayer }> }
 	| { type: 'player_left'; data: WithNow<{ playerId: string }> }
+	| { type: 'player_renamed'; data: WithNow<{ playerId: string; name: string }> }
 	| { type: 'settings_updated'; data: WithNow<{ settings: Settings }> }
 	| {
 			type: 'round_started';
@@ -133,6 +134,8 @@ export interface ApiError {
 }
 export interface CreateRoomRequest {
 	settings?: Partial<Settings>;
+	/** display name of the host as a player (validated like player names), default "Host" */
+	hostName?: string;
 }
 export interface CreateRoomResponse {
 	code: string;
@@ -142,6 +145,12 @@ export interface JoinRoomRequest {
 }
 export interface JoinRoomResponse {
 	playerId: string;
+}
+export interface RenameRequest {
+	name: string;
+}
+export interface RenameResponse {
+	name: string;
 }
 export type UpdateSettingsRequest = Partial<Settings>;
 export interface UpdateSettingsResponse {
