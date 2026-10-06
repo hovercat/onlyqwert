@@ -15,9 +15,12 @@ export interface Player {
 
 export interface Round {
 	index: number;
-	/** never sent to clients before reveal */
+	/** never sent to clients, in any payload */
 	pokemonId: number;
+	/** opaque token in the mask URL; distinct from spriteToken */
 	maskToken: string;
+	/** opaque token in the sprite URL; only handed to authorized viewers */
+	spriteToken: string;
 	startedAt: number;
 	endsAt: number;
 	correct: { playerId: string; points: number; at: number }[];

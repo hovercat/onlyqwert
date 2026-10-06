@@ -69,10 +69,16 @@ export interface CorrectEntry {
 	at: number;
 }
 
+/** Public Pokemon shape. The numeric id is never sent to clients. */
 export interface RevealedPokemon {
-	id: number;
 	name: string;
 	generation: number;
+}
+
+/** The real Pokemon plus an opaque, authorized sprite URL (`/api/rooms/{code}/sprite/{spriteToken}`). */
+export interface Reveal {
+	pokemon: RevealedPokemon;
+	spriteUrl: string;
 }
 
 export interface PublicRound {
@@ -91,8 +97,11 @@ export interface RoomSnapshot {
 	players: PublicPlayer[];
 	/** null in lobby */
 	round: PublicRound | null;
-	/** only present when phase is round_reveal, leaderboard or finished */
-	revealed: { pokemon: RevealedPokemon; spriteUrl: string } | null;
+	/**
+	 * Present when phase is round_reveal, leaderboard or finished, and also during round_active
+	 * for a viewer who already guessed correctly this round (never for others).
+	 */
+	revealed: Reveal | null;
 	you: { playerId?: string; isHost: boolean };
 	serverNow: number;
 }
@@ -110,7 +119,7 @@ export type SseEvent =
 			data: WithNow<{ index: number; total: number; maskUrl: string; startedAt: number; endsAt: number }>;
 	  }
 	| { type: 'player_correct'; data: WithNow<{ playerId: string; name: string; points: number; order: number }> }
-	| { type: 'round_ended'; data: WithNow<{ pokemon: RevealedPokemon; spriteUrl: string }> }
+	| { type: 'round_ended'; data: WithNow<Reveal> }
 	| { type: 'scoreboard'; data: WithNow<{ players: ScoreboardPlayer[] }> }
 	| { type: 'game_finished'; data: WithNow<{ podium: ScoreboardPlayer[]; players: ScoreboardPlayer[] }> }
 	| { type: 'room_closed'; data: WithNow<{ reason: string }> };
@@ -151,7 +160,7 @@ export interface GuessRequest {
 }
 export type GuessStatus = 'correct' | 'wrong' | 'already_correct' | 'not_active';
 export type GuessResponse =
-	| { status: 'correct'; points: number }
+	| ({ status: 'correct'; points: number } & Reveal)
 	| { status: Exclude<GuessStatus, 'correct'> };
 
 export const hostCookieName = (code: string) => `oq_host_${code}`;

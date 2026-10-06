@@ -1,15 +1,39 @@
 import { rankPlayers } from '../game/scoring';
-import type { PublicPlayer, RoomSnapshot, ScoreboardPlayer } from '../types';
+import type { PublicPlayer, Reveal, RoomSnapshot, ScoreboardPlayer } from '../types';
 import { now } from './clock';
 import { getPokemon } from './pokemon';
-import type { Player, Room } from './types';
+import type { Player, Room, Round } from './types';
 
 export function maskUrl(code: string, maskToken: string): string {
 	return `/api/rooms/${code}/mask/${maskToken}`;
 }
 
-export function spriteUrl(id: number): string {
-	return `/sprites/${id}.png`;
+export function spriteUrl(code: string, spriteToken: string): string {
+	return `/api/rooms/${code}/sprite/${spriteToken}`;
+}
+
+/** True once the round's answer may be shown to everyone. */
+export function roundEnded(room: Room, round: Round): boolean {
+	if (round !== room.rounds[room.rounds.length - 1]) return true;
+	return room.phase !== 'lobby' && room.phase !== 'round_active';
+}
+
+/** The public reveal (name, generation, sprite URL) for a round. Callers must have checked authorization. */
+export function revealOf(room: Room, round: Round): Reveal | null {
+	const entry = getPokemon(round.pokemonId);
+	if (!entry) return null;
+	return {
+		pokemon: { name: entry.name, generation: entry.generation },
+		spriteUrl: spriteUrl(room.code, round.spriteToken)
+	};
+}
+
+/** Reveal for a viewer: everyone after the round ended, only correct guessers before. */
+export function revealFor(room: Room, round: Round, player: Player | undefined): Reveal | null {
+	if (roundEnded(room, round) || (player && round.correct.some((c) => c.playerId === player.id))) {
+		return revealOf(room, round);
+	}
+	return null;
 }
 
 export function isHost(room: Room, hostToken: string | undefined): boolean {
@@ -73,16 +97,7 @@ export function snapshotFor(
 	const showRound = room.phase !== 'lobby' && latest;
 	const names = new Map(ranked.map((p) => [p.id, p.name]));
 	const you = resolvePlayer(room, opts);
-	let revealed: RoomSnapshot['revealed'] = null;
-	if (showRound && room.phase !== 'round_active') {
-		const entry = getPokemon(latest.pokemonId);
-		if (entry) {
-			revealed = {
-				pokemon: { id: entry.id, name: entry.name, generation: entry.generation },
-				spriteUrl: spriteUrl(entry.id)
-			};
-		}
-	}
+	const revealed = showRound ? revealFor(room, latest, you) : null;
 	return {
 		code: room.code,
 		phase: room.phase,

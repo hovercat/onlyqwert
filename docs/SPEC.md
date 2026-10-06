@@ -44,8 +44,9 @@ interface Player {
 
 interface Round {
   index: number;           // 0 based
-  pokemonId: number;       // never sent to clients before reveal
+  pokemonId: number;       // never sent to clients, in any payload
   maskToken: string;       // opaque random id used in mask URL
+  spriteToken: string;     // opaque random id used in sprite URL, distinct from maskToken
   startedAt: number;       // epoch ms, server clock
   endsAt: number;
   correct: { playerId: string; points: number; at: number }[]; // in order
@@ -88,12 +89,12 @@ All timers run on the server. Clients render countdowns from `endsAt` with a clo
 
 ## 5. Guessing and scoring
 
-1. Normalization (`normalizeName`): lowercase, Unicode NFD then strip diacritics, remove everything except `a-z0-9`. Examples: `Mr. Mime` → `mrmime`, `Flabébé` → `flabebe`, `Farfetch'd` → `farfetchd`, `Nidoran♀` → `nidoran` (both Nidorans accept `nidoran`, `nidoranf`/`nidoranm`).
-2. A guess is correct if `normalizeName(value) === normalizeName(answer)` or matches one of the Pokémon's listed aliases.
+1. Normalization (`normalizeName`): Unicode NFKC (fullwidth to halfwidth), locale independent lowercase, `ß` to `ss`, diacritics stripped on Latin letters only (Hangul and kana voicing marks are kept), katakana folded to hiragana, then everything except letters and digits (`\p{L}\p{N}`) removed, including whitespace, punctuation, symbols and middle dots. Examples: `Mr. Mime` → `mrmime`, `Flabébé` → `flabebe`, `Farfetch'd` → `farfetchd`, `Nidoran♀` → `nidoran`, `ピカチュウ` and `ぴかちゅう` are equal.
+2. A guess is correct if its normalized form equals the normalized English name or any alias. Aliases hold every localized species name from PokeAPI (de, fr, es, it, ja, ja-Hrkt, roomaji, ko, zh-Hans, zh-Hant, ...) plus `nidoranf`/`nidoranm`. The server precomputes a normalized `Set` per Pokémon and caches it.
 3. Score: `points = Math.round(100 * (endsAt - now) / (endsAt - startedAt))`, clamped to `[1, 100]` for a correct guess during an active round.
 4. A player can score at most once per round. After a correct guess, further guesses for that round are ignored (response `{ status: 'already_correct' }`).
 5. Guesses outside `round_active`, or arriving after `endsAt` (server clock), are rejected with `{ status: 'not_active' }`.
-6. Wrong guesses return `{ status: 'wrong' }` and are never broadcast (prevents leaking hints).
+6. On a correct guess the response also carries the real Pokémon and an authorized sprite URL (see section 6), so the guesser sees it immediately. Wrong guesses return `{ status: 'wrong' }` and are never broadcast (prevents leaking hints).
 7. Throttle: max 20 guesses per second per player; excess returns HTTP 429.
 8. Ranking: score descending, ties broken by earlier correct time in the latest round, then name.
 
@@ -111,11 +112,12 @@ All bodies are JSON. Errors are `{ error: string }` with appropriate status. Aut
 | `POST /api/rooms/[code]/next` | host | | `200`; advances leaderboard → next round / finished |
 | `POST /api/rooms/[code]/restart` | host | | `200`; finished → lobby, scores reset |
 | `POST /api/rooms/[code]/kick` | host | `{ playerId }` | `200` |
-| `POST /api/rooms/[code]/guess` | player | `{ value, round }` | `200 { status: 'correct', points } \| { status: 'wrong' \| 'already_correct' \| 'not_active' }`, 429 throttled |
+| `POST /api/rooms/[code]/guess` | player | `{ value, round }` | `200 { status: 'correct', points, pokemon: { name, generation }, spriteUrl } \| { status: 'wrong' \| 'already_correct' \| 'not_active' }`, 429 throttled |
 | `GET /api/rooms/[code]/mask/[maskToken]` | none | | `image/png` silhouette for the current round; 404 otherwise. Response must not reveal the Pokémon id (no redirect, `Cache-Control: no-store`). |
+| `GET /api/rooms/[code]/sprite/[spriteToken]` | player or host cookie | | `image/png` colored sprite. Allowed when the round has ended (phase `round_reveal`, `leaderboard`, `finished`) or the requester (player cookie, or host cookie resolving to the host player) already guessed correctly in that round. Otherwise 404, also for unknown or stale tokens (existence is never revealed). `Cache-Control: no-store`, no redirect, no id in headers. |
 | `GET /api/rooms/[code]/events` | player or host | | `text/event-stream` |
 
-`RoomSnapshot` contains code, phase, settings, players (`id, name, score, lastDelta, prevRank, rank, connected`; never tokens), current round public info (`index, total, maskUrl, endsAt, correct list with names`), revealed Pokémon only when phase ≥ `round_reveal`, and `you: { playerId?, isHost }`.
+`RoomSnapshot` contains code, phase, settings, players (`id, name, score, lastDelta, prevRank, rank, connected`; never tokens), current round public info (`index, total, maskUrl, endsAt, correct list with names`), revealed Pokémon (`{ pokemon: { name, generation }, spriteUrl }`) when phase ≥ `round_reveal`, and during `round_active` only for a viewer who already guessed correctly (so a refresh keeps it), never for others, and `you: { playerId?, isHost }`.
 
 ## 7. SSE events
 
@@ -128,7 +130,7 @@ Each message: `event: <type>` and `data: JSON` including `serverNow`. On connect
 | `settings_updated` | `{ settings }` |
 | `round_started` | `{ index, total, maskUrl, startedAt, endsAt }` |
 | `player_correct` | `{ playerId, name, points, order }` |
-| `round_ended` | `{ pokemon: { id, name, generation }, spriteUrl }` |
+| `round_ended` | `{ pokemon: { name, generation }, spriteUrl }` (no numeric id anywhere) |
 | `scoreboard` | `{ players: [{ id, name, score, lastDelta, prevRank, rank }] }` |
 | `game_finished` | `{ podium, players }` |
 | `room_closed` | `{ reason }` |
@@ -136,7 +138,7 @@ Each message: `event: <type>` and `data: JSON` including `serverNow`. On connect
 ## 8. Assets
 
 1. `src/lib/data/pokemon.json`: `[{ id, name, generation, aliases? }]` for national dex 1..1025.
-2. `static/sprites/{id}.png`: colored sprites (only used after reveal, served directly).
+2. `assets/sprites/{id}.png`: colored sprites, NOT under `static/`. Disk names use ids since they are never public. Served only through the sprite endpoint with a per round `spriteToken`, after the round ended or to players who guessed correctly.
 3. Masks: `assets/masks/{id}.png` (NOT under `static/`), solid single color silhouette generated from the sprite alpha channel by `scripts/make-masks.ts`. Served only through the mask endpoint so the URL never contains the id.
 4. Sprite source: Radical Red style / Gen 3 style front sprites where obtainable, otherwise the PokeAPI sprites repository (`PokeAPI/sprites`). Credits listed in `docs/CREDITS.md`. Sprites are fan content for non commercial use.
 5. Sprites are trimmed and scaled with nearest neighbour (`image-rendering: pixelated`) to stay crisp.
@@ -158,7 +160,7 @@ Each message: `event: <type>` and `data: JSON` including `serverNow`. On connect
 1. Rooms idle for 2h are deleted; a sweep runs every 5 min.
 2. Max 200 players per room, max 500 rooms total.
 3. Nicknames: trimmed, collapsed whitespace, 1..20 chars, HTML escaped by Svelte rendering.
-4. Never send the answer, Pokémon id or sprite URL for the active round before `round_ended`.
+4. Never send the Pokémon id to clients, in any payload. Never send the answer, or the sprite URL, for the active round before `round_ended`, except to a player who already guessed it correctly (their own guess response and snapshots).
 5. Tokens are 32 byte random values (`crypto.randomUUID` or `randomBytes`).
 
 ## 11. Testing requirements

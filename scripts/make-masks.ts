@@ -7,7 +7,7 @@ import sharp from 'sharp';
 
 const MAX_ID = 1025;
 const COLOR = { r: 11, g: 8, b: 32 }; // #0b0820
-const spriteDir = new URL('../static/sprites/', import.meta.url).pathname;
+const spriteDir = new URL('../assets/sprites/', import.meta.url).pathname;
 const maskDir = new URL('../assets/masks/', import.meta.url).pathname;
 mkdirSync(maskDir, { recursive: true });
 
