@@ -37,7 +37,7 @@
 	const warn = $derived(running && !urgent && frac < 0.4);
 </script>
 
-<div class="ring" class:urgent class:warn role="timer" aria-label={running ? `${secs} seconds left` : 'Time is up'}>
+<div class="cd-ring" class:urgent class:warn role="timer" aria-label={running ? `${secs} seconds left` : 'Time is up'}>
 	<svg viewBox="0 0 100 100" aria-hidden="true">
 		<circle class="track" cx="50" cy="50" r={R} fill="none" stroke-width="4" />
 		<circle
