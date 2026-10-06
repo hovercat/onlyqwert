@@ -109,7 +109,8 @@ export function subscribe(
 		if (done) return;
 		done = true;
 		clearInterval(sub.keepAlive);
-		subs.get(room.code)?.delete(sub);
+		// Already removed by closePlayerConnections/closeRoomConnections (kick, delete): no grace timer.
+		if (!subs.get(room.code)?.delete(sub)) return;
 		if (sub.playerId && room.players.has(sub.playerId) && !playerHasSubscriber(room.code, sub.playerId)) {
 			scheduleDisconnect(room, sub.playerId);
 		}

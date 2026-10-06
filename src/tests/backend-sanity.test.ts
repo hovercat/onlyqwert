@@ -93,3 +93,19 @@ describe('backend sanity', () => {
 		void checkAllCorrect;
 	});
 });
+
+describe('teardown', () => {
+	it('does not schedule grace timers after the room is deleted', async () => {
+		const { deleteRoom } = await import('#lib/server/rooms.ts');
+		const r = createRoom({ hostPlays: false, rounds: 2, secondsPerRound: 10 });
+		if (!r.ok) throw new Error(r.error);
+		const j = joinRoom(r.value, 'Ash');
+		if (!j.ok) throw new Error(j.error);
+		const unsub = subscribe(r.value, { playerToken: j.value.token }, () => {}, () => {});
+		startGame(r.value);
+		deleteRoom(r.value);
+		const before = vi.getTimerCount(); // only the idle sweeper
+		unsub();
+		expect(vi.getTimerCount()).toBe(before);
+	});
+});
