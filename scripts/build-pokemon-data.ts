@@ -1,6 +1,7 @@
 // Builds src/lib/data/pokemon.json from PokeAPI species names (CSV).
 // Usage: node scripts/build-pokemon-data.ts
 import { writeFileSync } from 'node:fs';
+import { normalizeName } from '../src/lib/game/normalize.ts';
 
 const CSV_URL =
 	'https://raw.githubusercontent.com/PokeAPI/pokeapi/master/data/v2/csv/pokemon_species_names.csv';
@@ -39,9 +40,14 @@ if (!res.ok) throw new Error(`CSV download failed: ${res.status}`);
 const lines = (await res.text()).split('\n').slice(1);
 
 const names = new Map<number, string>();
+const localized = new Map<number, string[]>();
 for (const line of lines) {
 	if (!line.trim()) continue;
 	const [id, lang, name] = parseLine(line);
+	if (!name) continue;
+	const list = localized.get(Number(id)) ?? [];
+	list.push(name.replace(/[‘’]/g, "'").trim());
+	localized.set(Number(id), list);
 	if (lang === '9') names.set(Number(id), name.replace(/[‘’]/g, "'").trim());
 }
 
@@ -55,8 +61,17 @@ for (let id = 1; id <= MAX_ID; id++) {
 		name,
 		generation
 	};
-	if (EXTRA_ALIASES[id]) entry.aliases = EXTRA_ALIASES[id];
+	// Every localized name, deduplicated after normalization; the English name is the display name.
+	const seen = new Set([normalizeName(name)]);
+	const aliases: string[] = [];
+	for (const a of [...(EXTRA_ALIASES[id] ?? []), ...(localized.get(id) ?? [])]) {
+		const key = normalizeName(a);
+		if (!key || seen.has(key)) continue;
+		seen.add(key);
+		aliases.push(a);
+	}
+	if (aliases.length) entry.aliases = aliases;
 	out.push(entry);
 }
-writeFileSync(new URL('../src/lib/data/pokemon.json', import.meta.url), JSON.stringify(out, null, '\t') + '\n');
+writeFileSync(new URL('../src/lib/data/pokemon.json', import.meta.url), JSON.stringify(out) + '\n');
 console.log(`wrote ${out.length} entries`);
