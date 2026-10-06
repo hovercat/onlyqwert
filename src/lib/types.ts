@@ -7,7 +7,7 @@ export interface Settings {
 	generations: number[];
 	/** 1..50, default 10 */
 	rounds: number;
-	/** 5..120, default 20 */
+	/** 5..120, default 45 */
 	secondsPerRound: number;
 	/** host also plays as a player, default true */
 	hostPlays: boolean;
@@ -16,7 +16,7 @@ export interface Settings {
 export const DEFAULT_SETTINGS: Settings = {
 	generations: [1],
 	rounds: 10,
-	secondsPerRound: 20,
+	secondsPerRound: 45,
 	hostPlays: true
 };
 
