@@ -27,3 +27,10 @@ No app bugs found, no app code changed. Observations (not bugs):
 
 ## Test plan
 `pnpm check` (0 errors), `pnpm test:server` (170 passed), `pnpm test:e2e` (2 passed).
+
+## Review (QA)
+Verdict: approved, merged after `git merge main` (PR 302 and 501), which applied cleanly with no conflicts. The port 5511 / `E2E_PORT` config already serves the PR 302 specs (`round-seconds.e2e.ts`, `round-timer.e2e.ts`) through `baseURL`.
+
+Quality: tests drive the real `+server.ts` handlers and assert bodies, cookies, room state, ranks, deltas and SSE payloads, not just status codes. Time is controlled with fake timers (`useFakeClock`), no real sleeps. State is isolated by `resetWorld()` (`__resetRooms` plus real timers) in `beforeEach`. SPEC section 11 paths are covered: create, join, guesses, scoring 50..100, early end, anti cheat leaks (mask, sprite, payload hygiene), SSE. The e2e scout brute forces gen 1 below the throttle; the full game spec takes about 25s, acceptable.
+
+Results: `pnpm check` 0 errors; `pnpm test:server` 174 passed on 3 consecutive runs (no flakiness); `pnpm test:coverage` statements 95.79%, branches 94.3%, functions 95.68%, lines 97.27%; `pnpm test:e2e` 4 passed (40s). No fixes needed.
