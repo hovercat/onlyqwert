@@ -1,11 +1,11 @@
 import { LIMITS } from '../types';
 import { now } from './clock';
-import { pickPokemon, getPokemon } from './pokemon';
+import { pickPokemon } from './pokemon';
 import { fail, ok } from './result';
 import type { ServiceResult } from './result';
 import { touch } from './rooms';
 import { broadcastSnapshots, emit, setHubHooks } from './sse';
-import { rankedPlayers, scoreboardPlayers, spriteUrl, maskUrl } from './snapshot';
+import { rankedPlayers, scoreboardPlayers, revealOf, maskUrl } from './snapshot';
 import { clearRoomTimer, setRoomTimer } from './timers';
 import { newToken } from './tokens';
 import type { Room, Round } from './types';
@@ -48,6 +48,7 @@ function startRound(room: Room): void {
 		index: room.rounds.length,
 		pokemonId: entry.id,
 		maskToken: newToken().slice(0, 24),
+		spriteToken: newToken().slice(0, 24),
 		startedAt,
 		endsAt: startedAt + ms,
 		correct: []
@@ -80,11 +81,7 @@ export function endRound(room: Room): void {
 	}
 	room.phase = 'round_reveal';
 	touch(room);
-	const entry = getPokemon(round.pokemonId)!;
-	emit(room, 'round_ended', {
-		pokemon: { id: entry.id, name: entry.name, generation: entry.generation },
-		spriteUrl: spriteUrl(entry.id)
-	});
+	emit(room, 'round_ended', revealOf(room, round)!);
 	broadcastSnapshots(room);
 	setRoomTimer(room.code, SLOT, LIMITS.revealMs, () => toLeaderboard(room));
 }

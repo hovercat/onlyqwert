@@ -1,4 +1,4 @@
-// Downloads front sprites for national dex 1..1025 into static/sprites/{id}.png.
+// Downloads front sprites for national dex 1..1025 into assets/sprites/{id}.png.
 // Source: PokeAPI/sprites (no reliable downloadable Radical Red set exists).
 // Downloads land in a fresh temp dir, are validated as real PNGs, then copied.
 // Usage: node scripts/download-sprites.ts [--force]
@@ -14,7 +14,7 @@ const BASE = 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/p
 const SIG = Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]);
 const force = process.argv.includes('--force');
 
-const outDir = new URL('../static/sprites/', import.meta.url).pathname;
+const outDir = new URL('../assets/sprites/', import.meta.url).pathname;
 mkdirSync(outDir, { recursive: true });
 const tmp = mkdtempSync(join(tmpdir(), 'sprites-'));
 
