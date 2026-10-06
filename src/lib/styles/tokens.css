@@ -1,0 +1,55 @@
+/* Theme tokens. Tailwind exposes these as utilities (bg-oq-yellow, text-oq-blue, font-display ...). */
+@theme {
+	--color-oq-bg: #0a0720;
+	--color-oq-indigo: #1a1050;
+	--color-oq-purple: #3b1d8f;
+	--color-oq-yellow: #ffcb05;
+	--color-oq-yellow-deep: #e0a800;
+	--color-oq-blue: #2ec4ff;
+	--color-oq-ink: #f4f1ff;
+	--color-oq-muted: #b9b0e0;
+	--color-oq-green: #3df58a;
+	--color-oq-red: #ff5470;
+	--font-display: 'Bungee', 'Lilita One', system-ui, sans-serif;
+	--font-sans: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+	--ease-elastic: cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+html {
+	color-scheme: dark;
+	background: var(--color-oq-bg);
+}
+
+body {
+	min-height: 100dvh;
+	margin: 0;
+	font-family: var(--font-sans);
+	color: var(--color-oq-ink);
+	background:
+		radial-gradient(60rem 40rem at 10% -10%, rgb(124 58 237 / 0.45), transparent 60%),
+		radial-gradient(50rem 40rem at 100% 10%, rgb(46 196 255 / 0.22), transparent 60%),
+		linear-gradient(160deg, var(--color-oq-bg) 0%, var(--color-oq-indigo) 55%, #2a1470 100%);
+	background-attachment: fixed;
+	overflow-x: hidden;
+	-webkit-tap-highlight-color: transparent;
+}
+
+:focus-visible {
+	outline: 3px solid var(--color-oq-yellow);
+	outline-offset: 2px;
+	border-radius: 0.5rem;
+}
+
+.pixelated {
+	image-rendering: pixelated;
+	image-rendering: crisp-edges;
+}
+
+.sr-only-live {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	overflow: hidden;
+	clip-path: inset(50%);
+	white-space: nowrap;
+}

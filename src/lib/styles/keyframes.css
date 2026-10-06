@@ -1,0 +1,50 @@
+@keyframes oq-pulse {
+	0%, 100% { transform: scale(1); filter: drop-shadow(0 0 6px rgb(255 84 112 / 0.6)); }
+	50% { transform: scale(1.04); filter: drop-shadow(0 0 18px rgb(255 84 112 / 0.95)); }
+}
+@keyframes oq-flash-green {
+	0% { box-shadow: 0 0 0 0 rgb(61 245 138 / 0.9); background-color: rgb(61 245 138 / 0.5); }
+	100% { box-shadow: 0 0 0 24px rgb(61 245 138 / 0); background-color: rgb(61 245 138 / 0.14); }
+}
+@keyframes oq-flash-white {
+	0% { opacity: 0.95; }
+	100% { opacity: 0; }
+}
+@keyframes oq-pop {
+	0% { transform: scale(0.4); opacity: 0; }
+	60% { transform: scale(1.25); opacity: 1; }
+	100% { transform: scale(1); opacity: 1; }
+}
+@keyframes oq-rise {
+	0% { transform: translateY(40px) scaleY(0.2); opacity: 0; }
+	100% { transform: translateY(0) scaleY(1); opacity: 1; }
+}
+@keyframes oq-float {
+	0%, 100% { transform: translateY(0) rotate(-2deg); }
+	50% { transform: translateY(-10px) rotate(2deg); }
+}
+@keyframes oq-shine {
+	0% { background-position: 0% 50%; }
+	100% { background-position: 200% 50%; }
+}
+@keyframes oq-noise {
+	0% { transform: translate(0, 0); }
+	20% { transform: translate(-3%, 2%); }
+	40% { transform: translate(2%, -3%); }
+	60% { transform: translate(-2%, -1%); }
+	80% { transform: translate(3%, 3%); }
+	100% { transform: translate(0, 0); }
+}
+@keyframes oq-blob {
+	0%, 100% { transform: translate(0, 0) scale(1); }
+	50% { transform: translate(4vw, -3vh) scale(1.15); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+	*, *::before, *::after {
+		animation-duration: 0.001ms !important;
+		animation-iteration-count: 1 !important;
+		transition-duration: 0.001ms !important;
+		scroll-behavior: auto !important;
+	}
+}
