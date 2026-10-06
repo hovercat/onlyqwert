@@ -1,10 +1,10 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { __resetRooms, createRoom, getRoom, joinRoom, snapshotFor, validateSettings } from '../lib/server/rooms';
-import { checkAllCorrect, endRound, nextRound, startGame } from '../lib/server/game';
-import { submitGuess } from '../lib/server/guess';
-import { getPokemon, pickPokemon } from '../lib/server/pokemon';
-import { generateRoomCode } from '../lib/server/codes';
-import { subscribe } from '../lib/server/sse';
+import { __resetRooms, createRoom, getRoom, joinRoom, snapshotFor, validateSettings } from '#lib/server/rooms.ts';
+import { checkAllCorrect, endRound, nextRound, startGame } from '#lib/server/game.ts';
+import { submitGuess } from '#lib/server/guess.ts';
+import { getPokemon, pickPokemon } from '#lib/server/pokemon.ts';
+import { generateRoomCode } from '#lib/server/codes.ts';
+import { subscribe } from '#lib/server/sse.ts';
 
 beforeEach(() => {
 	vi.useFakeTimers();

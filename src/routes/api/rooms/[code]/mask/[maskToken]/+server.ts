@@ -1,6 +1,6 @@
 import type { RequestHandler } from './$types';
-import { errorJson, withRoom } from '../../../../../../lib/server/http';
-import { readMask } from '../../../../../../lib/server/masks';
+import { errorJson, withRoom } from '#lib/server/http.ts';
+import { readMask } from '#lib/server/masks.ts';
 
 export const GET: RequestHandler = async ({ params }) => {
 	const g = withRoom(params.code);

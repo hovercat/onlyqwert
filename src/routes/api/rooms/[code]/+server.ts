@@ -1,7 +1,7 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-import { identity, withRoom } from '../../../../lib/server/http';
-import { snapshotFor } from '../../../../lib/server/rooms';
+import { identity, withRoom } from '#lib/server/http.ts';
+import { snapshotFor } from '#lib/server/rooms.ts';
 
 export const GET: RequestHandler = ({ params, cookies }) => {
 	const g = withRoom(params.code);

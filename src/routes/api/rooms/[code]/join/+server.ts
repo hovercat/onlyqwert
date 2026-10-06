@@ -1,8 +1,8 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-import { playerCookieName } from '../../../../../lib/types';
-import { errorJson, identity, readBody, setAuthCookie, withRoom } from '../../../../../lib/server/http';
-import { joinRoom, resolvePlayer } from '../../../../../lib/server/rooms';
+import { playerCookieName } from '#lib/types.ts';
+import { errorJson, identity, readBody, setAuthCookie, withRoom } from '#lib/server/http.ts';
+import { joinRoom, resolvePlayer } from '#lib/server/rooms.ts';
 
 export const POST: RequestHandler = async ({ params, request, cookies }) => {
 	const g = withRoom(params.code);

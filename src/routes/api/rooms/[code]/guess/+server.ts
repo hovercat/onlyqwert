@@ -1,7 +1,7 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-import { errorJson, identity, readBody, withRoom } from '../../../../../lib/server/http';
-import { submitGuess } from '../../../../../lib/server/guess';
+import { errorJson, identity, readBody, withRoom } from '#lib/server/http.ts';
+import { submitGuess } from '#lib/server/guess.ts';
 
 export const POST: RequestHandler = async ({ params, request, cookies }) => {
 	const g = withRoom(params.code);

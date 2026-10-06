@@ -1,7 +1,7 @@
 import type { RequestHandler } from './$types';
-import { errorJson, identity, withRoom } from '../../../../../lib/server/http';
-import { isHost, resolvePlayer } from '../../../../../lib/server/rooms';
-import { subscribe } from '../../../../../lib/server/sse';
+import { errorJson, identity, withRoom } from '#lib/server/http.ts';
+import { isHost, resolvePlayer } from '#lib/server/rooms.ts';
+import { subscribe } from '#lib/server/sse.ts';
 
 export const GET: RequestHandler = ({ params, cookies, request }) => {
 	const g = withRoom(params.code);

@@ -1,8 +1,8 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-import { errorJson, readBody, withHost } from '../../../../../lib/server/http';
-import { checkAllCorrect } from '../../../../../lib/server/game';
-import { removePlayer } from '../../../../../lib/server/rooms';
+import { errorJson, readBody, withHost } from '#lib/server/http.ts';
+import { checkAllCorrect } from '#lib/server/game.ts';
+import { removePlayer } from '#lib/server/rooms.ts';
 
 export const POST: RequestHandler = async (event) => {
 	const g = withHost(event);

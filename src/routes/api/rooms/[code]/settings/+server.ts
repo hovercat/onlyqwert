@@ -1,8 +1,8 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-import { playerCookieName } from '../../../../../lib/types';
-import { errorJson, readBody, setAuthCookie, withHost } from '../../../../../lib/server/http';
-import { updateSettings } from '../../../../../lib/server/rooms';
+import { playerCookieName } from '#lib/types.ts';
+import { errorJson, readBody, setAuthCookie, withHost } from '#lib/server/http.ts';
+import { updateSettings } from '#lib/server/rooms.ts';
 
 export const PATCH: RequestHandler = async (event) => {
 	const g = withHost(event);

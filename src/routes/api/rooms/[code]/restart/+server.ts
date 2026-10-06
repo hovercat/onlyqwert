@@ -1,7 +1,7 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-import { errorJson, withHost } from '../../../../../lib/server/http';
-import { restartGame } from '../../../../../lib/server/game';
+import { errorJson, withHost } from '#lib/server/http.ts';
+import { restartGame } from '#lib/server/game.ts';
 
 export const POST: RequestHandler = (event) => {
 	const g = withHost(event);
