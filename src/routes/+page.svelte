@@ -1,22 +1,21 @@
 <script lang="ts">
+	import type { PageProps } from './$types';
 	import Brand from '#lib/components/Brand.svelte';
 
 	const soon = [
-		{ title: 'Higher or Lower', blurb: 'Stats duel, chat votes live.' },
+		{ title: 'Higher or Lower', blurb: 'Stats duel, everyone votes live.' },
 		{ title: 'Type Rush', blurb: 'Fastest typer wins the room.' }
 	];
+
+	let { data }: PageProps = $props();
 </script>
 
-<main class="mx-auto flex min-h-dvh w-full max-w-5xl flex-col px-4 py-6 sm:px-8">
+<main class="mx-auto flex min-h-[calc(100dvh-4rem)] w-full max-w-5xl flex-col px-4 py-6 sm:px-8">
 	<header class="flex items-center justify-between"><Brand /></header>
 
 	<section class="py-12 text-center sm:py-20">
-		<h1 class="display text-4xl sm:text-6xl">
-			Play with your <span class="text-gradient">chat</span>,<br />live.
-		</h1>
-		<p class="mx-auto mt-4 max-w-xl text-lg text-oq-muted">
-			Open a room, share the code, and let your community compete on your stream. No accounts, no installs.
-		</p>
+		<h1 class="display text-gradient text-4xl sm:text-6xl">{data.branding.heroTitle}</h1>
+		<p class="mx-auto mt-4 max-w-xl text-lg text-oq-muted">{data.branding.heroTagline}</p>
 	</section>
 
 	<section aria-labelledby="games" class="pb-16">
@@ -33,7 +32,7 @@
 					<span class="display text-6xl text-oq-indigo" style="animation: oq-float 4s ease-in-out infinite">?</span>
 				</div>
 				<h3 class="display text-2xl">itspikachu</h3>
-				<p class="mt-2 text-oq-muted">Who is that Pokémon? Race your chat to name the silhouette.</p>
+				<p class="mt-2 text-oq-muted">Who is that Pokémon? Name the silhouette before the timer runs out.</p>
 				<span class="btn btn-primary mt-5 w-full">Play now</span>
 			</a>
 

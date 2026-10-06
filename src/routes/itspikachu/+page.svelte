@@ -57,7 +57,7 @@
 		<section class="glass flex flex-col p-6" aria-labelledby="host-h">
 			<h2 id="host-h" class="display text-2xl text-oq-yellow">Host a room</h2>
 			<p class="mt-2 flex-1 text-oq-muted">
-				You are the streamer. Pick generations, rounds and timing, then share the code with your chat.
+				You are the streamer. Pick generations, rounds and timing, then share the code.
 			</p>
 			<label class="mt-4 text-sm font-semibold text-oq-muted" for="host-name">Your name</label>
 			<input

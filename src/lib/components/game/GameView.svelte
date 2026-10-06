@@ -73,7 +73,7 @@
 				/>
 			</div>
 		{:else}
-			<p class="glass p-3 text-center text-oq-muted">You are hosting. Watch the chat go wild!</p>
+			<p class="glass p-3 text-center text-oq-muted">You are hosting. Watch the guesses roll in!</p>
 		{/if}
 	</section>
 
