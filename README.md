@@ -81,6 +81,7 @@ src/lib/data/pokemon.json
 | `pnpm check` | `svelte-kit sync` and `svelte-check` type checking. |
 | `pnpm check:watch` | Type checking in watch mode. |
 | `pnpm test:unit` | Vitest in watch mode (add `--run` for a single run). |
+| `pnpm test:server` | Server and endpoint Vitest specs, single run, no browser needed. |
 | `pnpm test:e2e` | Install Playwright browsers and run the e2e tests. |
 | `pnpm test` | Unit tests once, then e2e tests. |
 | `pnpm assets:download` / `assets:data` / `assets:masks` | Asset pipeline, see above. |
@@ -89,7 +90,7 @@ src/lib/data/pokemon.json
 
 ```sh
 pnpm check                                  # types and Svelte diagnostics
-pnpm exec vitest --run --project server     # server and endpoint unit tests (no browser needed)
+pnpm test:server                            # server and endpoint unit tests (no browser needed)
 pnpm test:unit --run                        # all Vitest projects (the client project needs Playwright Chromium)
 pnpm test:e2e                               # Playwright e2e (builds the app and serves the preview on port 4173)
 ```
