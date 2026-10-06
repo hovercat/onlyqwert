@@ -1,1 +1,6 @@
 @import 'tailwindcss';
+@import '../lib/styles/tokens.css';
+@import '../lib/styles/keyframes.css';
+@import '../lib/styles/noise.css';
+@import '../lib/styles/glass.css';
+@import '../lib/styles/game.css';
