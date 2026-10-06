@@ -2,9 +2,11 @@
 	import { goto } from '$app/navigation';
 	import Brand from '#lib/components/Brand.svelte';
 	import { api, loadLocal, normalizeCode, saveLocal } from '#lib/client/api.ts';
+	import { LIMITS } from '#lib/types.ts';
 	import type { CreateRoomResponse, JoinRoomResponse } from '#lib/types.ts';
 
 	let hosting = $state(false);
+	let hostName = $state(loadLocal('oq_host_name') ?? 'Host');
 	let hostError = $state('');
 	let code = $state('');
 	let name = $state(loadLocal('oq_nick') ?? '');
@@ -14,8 +16,9 @@
 	async function host() {
 		hosting = true;
 		hostError = '';
-		const res = await api<CreateRoomResponse>('POST', '/api/rooms', {});
+		const res = await api<CreateRoomResponse>('POST', '/api/rooms', { hostName: hostName.trim() || 'Host' });
 		if (res.ok && res.data?.code) {
+			saveLocal('oq_host_name', hostName.trim() || 'Host');
 			await goto(`/itspikachu/${res.data.code}`);
 		} else {
 			hostError = res.error ?? 'Could not create room.';
@@ -56,6 +59,15 @@
 			<p class="mt-2 flex-1 text-oq-muted">
 				You are the streamer. Pick generations, rounds and timing, then share the code with your chat.
 			</p>
+			<label class="mt-4 text-sm font-semibold text-oq-muted" for="host-name">Your name</label>
+			<input
+				id="host-name"
+				class="field mt-1"
+				placeholder="Host"
+				maxlength={LIMITS.nameMax}
+				autocomplete="nickname"
+				bind:value={hostName}
+			/>
 			<button class="btn btn-primary mt-6" onclick={host} disabled={hosting}>
 				{hosting ? 'Creating...' : 'Create room'}
 			</button>
