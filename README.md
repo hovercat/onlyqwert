@@ -121,6 +121,8 @@ A multi stage `Dockerfile` and `compose.yaml` are included (the image listens on
 docker compose up --build
 ```
 
+Optional site copy can be set in `.env` (see `.env.example`) so it stays out of the repo: `SITE_HERO_TITLE`, `SITE_HERO_TAGLINE` and `SITE_FOOTER_LINKS` (format `Label|https://url;Label|https://url`). Without them the landing page shows neutral defaults and no footer.
+
 ## Project structure
 
 ```

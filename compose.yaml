@@ -7,5 +7,9 @@ services:
       # Behind a reverse proxy (Caddy) that sets X-Forwarded-For
       ADDRESS_HEADER: X-Forwarded-For
       XFF_DEPTH: "1"
+      # Optional site copy, set in .env (kept out of git)
+      SITE_HERO_TITLE: ${SITE_HERO_TITLE:-}
+      SITE_HERO_TAGLINE: ${SITE_HERO_TAGLINE:-}
+      SITE_FOOTER_LINKS: ${SITE_FOOTER_LINKS:-}
     ports:
       - "${BIND:-127.0.0.1}:${HOST_PORT:-3000}:3000"

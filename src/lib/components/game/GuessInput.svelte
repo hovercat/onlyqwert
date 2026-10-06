@@ -25,16 +25,46 @@
 	$effect(() => {
 		round; // reset on every new round
 		value = '';
+		lastSent = '';
 		input?.focus({ preventScroll: true });
 	});
 
 	let composing = false;
+	// At most one request in flight; while it runs, newer keystrokes only update `queued`,
+	// so typing never waits on the network and the server always sees the latest text.
+	let inflight = false;
+	let queued = false;
+	let lastSent = '';
 
-	async function send() {
+	function send() {
 		if (composing || locked || !active || !value.trim()) return;
-		const res = await api<GuessResponse>('POST', `/api/rooms/${code}/guess`, { value, round });
-		const d = res.data;
-		if (res.ok && d && d.status === 'correct') onscored(d as CorrectGuessResult);
+		if (inflight) {
+			queued = true;
+			return;
+		}
+		if (value === lastSent) return;
+		void flush();
+	}
+
+	async function flush() {
+		inflight = true;
+		try {
+			do {
+				queued = false;
+				const sent = value;
+				const sentRound = round;
+				lastSent = sent;
+				const res = await api<GuessResponse>('POST', `/api/rooms/${code}/guess`, { value: sent, round: sentRound });
+				const d = res.data;
+				if (res.ok && d && d.status === 'correct') {
+					onscored(d as CorrectGuessResult);
+					return;
+				}
+				if (res.status === 429) await new Promise((r) => setTimeout(r, 150));
+			} while ((queued || value !== lastSent) && !locked && active && value.trim());
+		} finally {
+			inflight = false;
+		}
 	}
 </script>
 
