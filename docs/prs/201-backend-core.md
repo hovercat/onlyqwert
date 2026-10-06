@@ -20,3 +20,20 @@ In memory room store, game state machine with server side timers, guessing and s
 
 ## Test plan
 `npm run check` and `npx vitest --run --project server` pass.
+
+## Review
+
+Verdict: **Approved with fixes** (merged after main was merged in, real `pokemon.json` and masks in use).
+
+Checked and OK:
+1. No leaks before `round_ended`: snapshots expose only `maskUrl` (opaque 24 hex token), `revealed` is null while `round_active`, tokens are never serialized, wrong guesses are never broadcast. The mask endpoint returns PNG bytes directly with `Cache-Control: no-store` and no redirect, and it 404s for stale or unknown tokens.
+2. Scoring is computed server side: `calculateScore` clamps to [1, 100]; there is one score per player per round; a wrong round index, a guess at or after `endsAt`, or a guess outside `round_active` returns `not_active`.
+3. Every host route goes through `withHost` (403 otherwise). State transitions are guarded (409).
+4. Room timers are cleared on next, restart, finish and delete. Cookies are `HttpOnly; SameSite=Lax; Path=/; Max-Age=86400`. The throttle allows 20/s and then returns 429 with `Retry-After`.
+5. Design points accepted: points are applied at round end (snapshots already list per-player points in `round.correct`). Players start `connected: true` with a 10s grace period. Early round end is rechecked after a kick and after a grace expiry.
+
+Fixes:
+1. `fix: no grace timer for streams closed by kick or room delete`. An SSE abort after `deleteRoom` re-armed `scheduleDisconnect` on the dead room. That could call `checkAllCorrect`, then `endRound`, and start new timers on a deleted room. Regression test added.
+2. `refactor: use #lib subpath imports`. SvelteKit 3 removed `$lib`, so `$lib` really fails. `#lib/...` (package.json `imports`) works when it includes the explicit `.ts` extension, so the routes and tests now use `#lib/server/x.ts`.
+
+Verified with `pnpm check` (0 errors), `pnpm exec vitest --run --project server` (6 passed), and a curl smoke test against `pnpm dev`.
