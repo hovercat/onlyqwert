@@ -102,14 +102,21 @@ function newPlayer(room: Room, name: string, isHostPlayer = false): Player {
 }
 
 /** `settings` is the (untrusted) partial settings object from the request body. */
-export function createRoom(settings?: unknown): ServiceResult<Room> {
+export function createRoom(settings?: unknown, rawHostName?: unknown): ServiceResult<Room> {
 	if (rooms.size >= LIMITS.maxRooms) return fail(503, 'Too many rooms, try again later');
+	let hostName = 'Host';
+	if (rawHostName !== undefined && rawHostName !== null) {
+		const n = validateName(rawHostName);
+		if (typeof n !== 'string') return fail(400, n.error);
+		hostName = n;
+	}
 	const valid = validateSettings(settings);
 	if (typeof valid === 'string') return fail(400, valid);
 	const t = now();
 	const room: Room = {
 		code: generateRoomCode((c) => rooms.has(c)),
 		hostToken: newToken(),
+		hostName,
 		settings: valid,
 		phase: 'lobby',
 		players: new Map(),
@@ -125,8 +132,8 @@ export function createRoom(settings?: unknown): ServiceResult<Room> {
 }
 
 function addHostPlayer(room: Room): Player {
-	let name = 'Host';
-	for (let i = 2; nameTaken(room, name); i++) name = `Host ${i}`;
+	let name = room.hostName;
+	for (let i = 2; nameTaken(room, name); i++) name = `${room.hostName.slice(0, LIMITS.nameMax - 3)} ${i}`;
 	const p = newPlayer(room, name, true);
 	room.players.set(p.id, p);
 	room.hostPlayerId = p.id;
@@ -148,6 +155,20 @@ export function joinRoom(room: Room, rawName: unknown): ServiceResult<Player> {
 	emit(room, 'player_joined', { player: toPublicPlayer(pub) });
 	broadcastSnapshots(room);
 	return ok(player);
+}
+
+/** Renames a player (lobby only, unique case insensitively). Host player renames also update the stored hostName. */
+export function renamePlayer(room: Room, player: Player, rawName: unknown): ServiceResult<string> {
+	if (room.phase !== 'lobby') return fail(409, 'Names can only change in the lobby');
+	const name = validateName(rawName);
+	if (typeof name !== 'string') return fail(400, name.error);
+	if (nameTaken(room, name, player.id)) return fail(409, 'Name already taken');
+	player.name = name;
+	if (player.id === room.hostPlayerId) room.hostName = name;
+	touch(room);
+	emit(room, 'player_renamed', { playerId: player.id, name });
+	broadcastSnapshots(room);
+	return ok(name);
 }
 
 /** Lobby only (caller checks). Applies validated settings; adds/removes the host player. */
