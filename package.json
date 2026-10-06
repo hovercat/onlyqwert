@@ -14,7 +14,7 @@
 		"test:server": "vitest --run --project server",
 		"test:coverage": "vitest --run --project server --coverage",
 		"test": "pnpm test:unit --run && pnpm test:e2e",
-		"test:e2e": "playwright install && playwright test",
+		"test:e2e": "playwright install chromium && playwright test",
 		"assets:data": "node scripts/build-pokemon-data.ts",
 		"assets:download": "node scripts/download-sprites.ts",
 		"assets:masks": "node scripts/make-masks.ts"
