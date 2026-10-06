@@ -25,8 +25,9 @@ The first game is **itspikachu**, a "Who's that Pokémon?" silhouette guessing g
 7. Guesses are accepted in all languages (localized species names from PokeAPI, accents, case, punctuation and kana variants are normalized).
 8. Anti cheat: opaque per round mask and sprite tokens, no Pokémon ids are ever sent to clients, wrong guesses are never broadcast, and the colored sprite is only revealed after the round or to a player who already guessed it correctly.
 9. Reveal on your own correct guess: the guesser sees the real sprite immediately.
-10. Host name and streamer mode (hide the room code behind a reveal button).
-11. Responsive: designed for mobile and desktop, with a neon, glassy look and `prefers-reduced-motion` support.
+10. Host name: the host picks a display name when creating a room (default "Host"), and every player, host included, can rename themselves in the lobby.
+11. Streamer mode (hide the room code behind a reveal button).
+12. Responsive: designed for mobile and desktop, with a neon, glassy look and `prefers-reduced-motion` support.
 
 ## Tech stack
 
@@ -136,9 +137,10 @@ Full details, payloads and error codes are in [docs/SPEC.md](docs/SPEC.md) (sect
 
 | Method and path | Purpose |
 |---|---|
-| `POST /api/rooms` | Create a room (sets the host cookie). |
+| `POST /api/rooms` | Create a room with settings and optional `hostName` (sets the host cookie). |
 | `GET /api/rooms/[code]` | Room snapshot. |
 | `POST /api/rooms/[code]/join` | Join with a nickname (sets the player cookie). |
+| `PATCH /api/rooms/[code]/me` | Rename yourself in the lobby (unique, case insensitive). |
 | `PATCH /api/rooms/[code]/settings` | Host: change generations, rounds, seconds. |
 | `POST /api/rooms/[code]/start` | Host: start the game. |
 | `POST /api/rooms/[code]/next` | Host: advance from the leaderboard. |
