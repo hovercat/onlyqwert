@@ -93,10 +93,10 @@ src/lib/data/pokemon.json
 pnpm check                                  # types and Svelte diagnostics
 pnpm test:server                            # server and endpoint unit tests (no browser needed)
 pnpm test:unit --run                        # all Vitest projects (the client project needs Playwright Chromium)
-pnpm test:e2e                               # Playwright e2e (builds the app and serves the preview on port 4173)
+pnpm test:e2e                               # Playwright e2e (builds the app and serves the preview on port 5511, override with E2E_PORT)
 ```
 
-Server specs live in `src/tests/`, e2e specs are `*.e2e.ts` files next to the routes. They cover room creation and joining, guesses, score calculation, reveal tokens and name normalization.
+Server and endpoint specs live in `src/tests/` (`src/tests/api/*.test.ts` call the real `+server.ts` handlers through `src/tests/helpers.ts`), e2e specs are `*.e2e.ts` files next to the routes. `pnpm test:coverage` prints coverage for the server code.
 
 ## Production build and run
 
